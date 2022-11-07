@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="RedNoise"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;CMake Files\..\;CMake Files\..\MinGW\;CMake Files\..\MinGW\lib\;CMake Files\..\MinGW\lib\cmake\;CMake Files\..\MinGW\lib\cmake\SDL2\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="D:/RedNoise/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="D:/MinGW/bin/make.exe -f &quot;D:/RedNoise/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="D:/MinGW/bin/make.exe -f &quot;D:/RedNoise/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="D:/MinGW/bin/make.exe -f &quot;D:/RedNoise/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="D:/MinGW/bin/make.exe -f &quot;D:/RedNoise/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="RedNoise">
+				<Option output="D:/RedNoise/cmake-build-debug/RedNoise.exe" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="D:/RedNoise/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/opt/local/i686-w64-mingw32/include/SDL2"/>
+					<Add directory="D:/RedNoise/libs/glm-0.9.7.2"/>
+					<Add directory="D:/RedNoise/libs/sdw"/>
+					<Add directory="d:\mingw\bin\../lib/gcc/mingw32/6.3.0/include/c++"/>
+					<Add directory="d:\mingw\bin\../lib/gcc/mingw32/6.3.0/include/c++/mingw32"/>
+					<Add directory="d:\mingw\bin\../lib/gcc/mingw32/6.3.0/include/c++/backward"/>
+					<Add directory="d:\mingw\bin\../lib/gcc/mingw32/6.3.0/include"/>
+					<Add directory="d:\mingw\bin\../lib/gcc/mingw32/6.3.0/../../../../include"/>
+					<Add directory="d:\mingw\bin\../lib/gcc/mingw32/6.3.0/include-fixed"/>
+					<Add directory="d:\mingw\bin\../lib/gcc/mingw32/6.3.0/../../../../mingw32/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="D:/MinGW/bin/make.exe -f &quot;D:/RedNoise/cmake-build-debug/Makefile&quot;  VERBOSE=1 RedNoise"/>
+					<CompileFile command="D:/MinGW/bin/make.exe -f &quot;D:/RedNoise/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="D:/MinGW/bin/make.exe -f &quot;D:/RedNoise/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="D:/MinGW/bin/make.exe -f &quot;D:/RedNoise/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="RedNoise/fast">
+				<Option output="D:/RedNoise/cmake-build-debug/RedNoise.exe" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="D:/RedNoise/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/opt/local/i686-w64-mingw32/include/SDL2"/>
+					<Add directory="D:/RedNoise/libs/glm-0.9.7.2"/>
+					<Add directory="D:/RedNoise/libs/sdw"/>
+					<Add directory="d:\mingw\bin\../lib/gcc/mingw32/6.3.0/include/c++"/>
+					<Add directory="d:\mingw\bin\../lib/gcc/mingw32/6.3.0/include/c++/mingw32"/>
+					<Add directory="d:\mingw\bin\../lib/gcc/mingw32/6.3.0/include/c++/backward"/>
+					<Add directory="d:\mingw\bin\../lib/gcc/mingw32/6.3.0/include"/>
+					<Add directory="d:\mingw\bin\../lib/gcc/mingw32/6.3.0/../../../../include"/>
+					<Add directory="d:\mingw\bin\../lib/gcc/mingw32/6.3.0/include-fixed"/>
+					<Add directory="d:\mingw\bin\../lib/gcc/mingw32/6.3.0/../../../../mingw32/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="D:/MinGW/bin/make.exe -f &quot;D:/RedNoise/cmake-build-debug/Makefile&quot;  VERBOSE=1 RedNoise/fast"/>
+					<CompileFile command="D:/MinGW/bin/make.exe -f &quot;D:/RedNoise/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="D:/MinGW/bin/make.exe -f &quot;D:/RedNoise/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="D:/MinGW/bin/make.exe -f &quot;D:/RedNoise/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="D:/RedNoise/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="D:/MinGW/bin/make.exe -f &quot;D:/RedNoise/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="D:/MinGW/bin/make.exe -f &quot;D:/RedNoise/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="D:/MinGW/bin/make.exe -f &quot;D:/RedNoise/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="D:/MinGW/bin/make.exe -f &quot;D:/RedNoise/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="D:/RedNoise/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="D:/MinGW/bin/make.exe -f &quot;D:/RedNoise/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="D:/MinGW/bin/make.exe -f &quot;D:/RedNoise/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="D:/MinGW/bin/make.exe -f &quot;D:/RedNoise/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="D:/MinGW/bin/make.exe -f &quot;D:/RedNoise/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="D:/RedNoise/libs/sdw/CanvasPoint.cpp">
+			<Option target="RedNoise"/>
+		</Unit>
+		<Unit filename="D:/RedNoise/libs/sdw/CanvasPoint.h">
+			<Option target="RedNoise"/>
+		</Unit>
+		<Unit filename="D:/RedNoise/libs/sdw/CanvasTriangle.cpp">
+			<Option target="RedNoise"/>
+		</Unit>
+		<Unit filename="D:/RedNoise/libs/sdw/CanvasTriangle.h">
+			<Option target="RedNoise"/>
+		</Unit>
+		<Unit filename="D:/RedNoise/libs/sdw/Colour.cpp">
+			<Option target="RedNoise"/>
+		</Unit>
+		<Unit filename="D:/RedNoise/libs/sdw/Colour.h">
+			<Option target="RedNoise"/>
+		</Unit>
+		<Unit filename="D:/RedNoise/libs/sdw/DrawingWindow.cpp">
+			<Option target="RedNoise"/>
+		</Unit>
+		<Unit filename="D:/RedNoise/libs/sdw/DrawingWindow.h">
+			<Option target="RedNoise"/>
+		</Unit>
+		<Unit filename="D:/RedNoise/libs/sdw/ModelTriangle.cpp">
+			<Option target="RedNoise"/>
+		</Unit>
+		<Unit filename="D:/RedNoise/libs/sdw/ModelTriangle.h">
+			<Option target="RedNoise"/>
+		</Unit>
+		<Unit filename="D:/RedNoise/libs/sdw/RayTriangleIntersection.cpp">
+			<Option target="RedNoise"/>
+		</Unit>
+		<Unit filename="D:/RedNoise/libs/sdw/RayTriangleIntersection.h">
+			<Option target="RedNoise"/>
+		</Unit>
+		<Unit filename="D:/RedNoise/libs/sdw/TextureMap.cpp">
+			<Option target="RedNoise"/>
+		</Unit>
+		<Unit filename="D:/RedNoise/libs/sdw/TextureMap.h">
+			<Option target="RedNoise"/>
+		</Unit>
+		<Unit filename="D:/RedNoise/libs/sdw/TexturePoint.cpp">
+			<Option target="RedNoise"/>
+		</Unit>
+		<Unit filename="D:/RedNoise/libs/sdw/TexturePoint.h">
+			<Option target="RedNoise"/>
+		</Unit>
+		<Unit filename="D:/RedNoise/libs/sdw/Utils.cpp">
+			<Option target="RedNoise"/>
+		</Unit>
+		<Unit filename="D:/RedNoise/libs/sdw/Utils.h">
+			<Option target="RedNoise"/>
+		</Unit>
+		<Unit filename="D:/RedNoise/src/RedNoise.cpp">
+			<Option target="RedNoise"/>
+		</Unit>
+		<Unit filename="D:/RedNoise/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="D:/RedNoise/../MinGW/lib/cmake/SDL2/sdl2-config-version.cmake">
+			<Option virtualFolder="CMake Files\..\MinGW\lib\cmake\SDL2\"/>
+		</Unit>
+		<Unit filename="D:/RedNoise/../MinGW/lib/cmake/SDL2/sdl2-config.cmake">
+			<Option virtualFolder="CMake Files\..\MinGW\lib\cmake\SDL2\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

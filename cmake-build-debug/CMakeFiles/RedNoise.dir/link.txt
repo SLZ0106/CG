@@ -1,0 +1,3 @@
+"D:\JetBrains\CLion 2022.2.3\bin\cmake\win\bin\cmake.exe" -E rm -f CMakeFiles\RedNoise.dir/objects.a
+D:\MinGW\bin\ar.exe qc CMakeFiles\RedNoise.dir/objects.a @CMakeFiles\RedNoise.dir\objects1.rsp
+D:\MinGW\bin\g++.exe -g -Wl,--whole-archive CMakeFiles\RedNoise.dir/objects.a -Wl,--no-whole-archive -o RedNoise.exe -Wl,--out-implib,libRedNoise.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\RedNoise.dir\linklibs.rsp
