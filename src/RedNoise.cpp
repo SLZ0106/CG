@@ -17,6 +17,8 @@
 glm::vec3 cameraPosition (0.0, 0.0, 4.0);
 glm::mat3 cameraOrientation (1, 0, 0, 0, 1, 0 ,0, 0, 1);
 glm::mat3 Rotation(1, 0, 0, 0, 1, 0 ,0, 0, 1);
+glm::vec3 lightposition = glm::vec3(0.0, 0.5, 0.0);
+float focalLength = 2.0;
 float x = 0.0;
 float y = 0.0;
 glm::vec3 newCameraPosition = cameraPosition;
@@ -540,7 +542,7 @@ void drawIncidence(DrawingWindow &window, const std::vector<ModelTriangle>& mode
             int S = 8;
             RayTriangleIntersection closestIntersection = getClosestIntersection(modelTriangles, cameraPosition, rayDirection);
             Colour colour = closestIntersection.intersectedTriangle.colour;
-            glm::vec3 lightDirection = glm::normalize(closestIntersection.intersectionPoint - lightPosition);
+            glm::vec3 lightDirection = closestIntersection.intersectionPoint - lightPosition;
             ModelTriangle triangle = closestIntersection.intersectedTriangle;
             float intensity = S /(4*3.1415*glm::length(lightDirection)*glm::length(lightDirection));
             float incidenceintensity = glm::clamp<float>(glm::dot(triangle.normal, -lightDirection), 0.0, 1.0);
@@ -573,7 +575,7 @@ void drawSpecular(DrawingWindow &window, const std::vector<ModelTriangle>& model
             int S = 8;
             RayTriangleIntersection closestIntersection = getClosestIntersection(modelTriangles, cameraPosition, rayDirection);
             Colour colour = closestIntersection.intersectedTriangle.colour;
-            glm::vec3 lightDirection = glm::normalize(closestIntersection.intersectionPoint - lightPosition);
+            glm::vec3 lightDirection = closestIntersection.intersectionPoint - lightPosition;
             ModelTriangle triangle = closestIntersection.intersectedTriangle;
             float intensity = S /(4*3.1415*glm::length(lightDirection)*glm::length(lightDirection));
             glm::vec3 reflection = glm::normalize(lightDirection - (2*glm::dot(lightDirection, triangle.normal)*triangle.normal));
@@ -583,10 +585,11 @@ void drawSpecular(DrawingWindow &window, const std::vector<ModelTriangle>& model
             float incidenceintensity = glm::clamp<float>(glm::dot(triangle.normal, -lightDirection), 0.0, 1.0);
             RayTriangleIntersection lightIntersection = getClosestIntersection(modelTriangles, lightPosition, lightDirection);
             if (closestIntersection.triangleIndex != lightIntersection.triangleIndex) {
-                red = 0;
-                green = 0;
-                blue = 0;
+                red = (colour.red*(incidenceintensity*intensity + specularintensity)+25)*0.3;
+                green = ((colour.green*(incidenceintensity*intensity + specularintensity)+25)*0.3);
+                blue = ((colour.blue*(incidenceintensity*intensity + specularintensity)+25)*0.3);
             }else{
+                //Plus 25 means that the colour is never black and for Ambient Lighting
                 Colour colour = closestIntersection.intersectedTriangle.colour;
                 red = fmin(colour.red*(incidenceintensity*intensity + specularintensity)+25,255);
                 green = fmin(colour.green*(incidenceintensity*intensity + specularintensity)+25,255);
@@ -601,6 +604,7 @@ void drawSpecular(DrawingWindow &window, const std::vector<ModelTriangle>& model
 
 // ---------------------- Show in window ---------------------- //
 void handleEvent(SDL_Event event, DrawingWindow &window) {
+    auto modelTriangles = objReader("cornell-box.obj", "cornell-box.mtl", 0.35);
 	if (event.type == SDL_KEYDOWN) {
 		if (event.key.keysym.sym == SDLK_LEFT) {
             std::cout << "LEFT" << std::endl;
@@ -637,8 +641,6 @@ void handleEvent(SDL_Event event, DrawingWindow &window) {
             point3.texturePoint.x = 65; point3.texturePoint.y = 330;
             drawTextureTriangle(window, getTextureMap("texture.ppm"), CanvasTriangle(point1, point2, point3));
         } else if(event.key.keysym.sym == SDLK_p) {
-            float focalLength = 2.0;
-            auto modelTriangles = objReader("cornell-box.obj", "cornell-box.mtl", 0.35);
             PointCloud(window, modelTriangles, cameraPosition, cameraOrientation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
             WireFrame(window, modelTriangles, cameraPosition, cameraOrientation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
             Rasterised(window, modelTriangles, cameraPosition, cameraOrientation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
@@ -646,31 +648,21 @@ void handleEvent(SDL_Event event, DrawingWindow &window) {
             window.clearPixels();
             clearDepthBuffer();
             cameraPosition.y -= 0.05;
-            float focalLength = 2.0;
-            auto modelTriangles = objReader("cornell-box.obj", "cornell-box.mtl", 0.35);
             Rasterised(window, modelTriangles, cameraPosition, cameraOrientation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
         } else if (event.key.keysym.sym == SDLK_s) {
             window.clearPixels();
             clearDepthBuffer();
             cameraPosition.y += 0.05;
-            float focalLength = 2.0;
-            auto modelTriangles = objReader("cornell-box.obj", "cornell-box.mtl", 0.35);
             Rasterised(window, modelTriangles, cameraPosition, cameraOrientation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
         } else if (event.key.keysym.sym == SDLK_a) {
             window.clearPixels();
             clearDepthBuffer();
             cameraPosition.x += 0.05;
-            float focalLength = 2.0;
-            auto modelTriangles = objReader("cornell-box.obj", "cornell-box.mtl", 0.35);
             Rasterised(window, modelTriangles, cameraPosition, cameraOrientation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
         } else if (event.key.keysym.sym == SDLK_d) {
             window.clearPixels();
             clearDepthBuffer();
             cameraPosition.x -= 0.05;
-            float focalLength = 2.0;
-            auto modelTriangles = objReader("cornell-box.obj", "cornell-box.mtl", 0.35);
-            PointCloud(window, modelTriangles, cameraPosition, cameraOrientation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
-            WireFrame(window, modelTriangles, cameraPosition, cameraOrientation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
             Rasterised(window, modelTriangles, cameraPosition, cameraOrientation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
         } else if (event.key.keysym.sym == SDLK_q) {
             //left
@@ -681,8 +673,6 @@ void handleEvent(SDL_Event event, DrawingWindow &window) {
             glm::mat3 cameraRotation = glm::mat3(cos(radianx), 0, sin(radianx), 0, 1, 0, -sin(radianx), 0, cos(radianx));
             cameraPosition = cameraPosition * cameraRotation;
             Rotation = Rotation * cameraRotation;
-            float focalLength = 2.0;
-            auto modelTriangles = objReader("cornell-box.obj", "cornell-box.mtl", 0.35);
             Rasterised(window, modelTriangles, cameraPosition, Rotation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
         } else if (event.key.keysym.sym == SDLK_e) {
             //right
@@ -693,8 +683,6 @@ void handleEvent(SDL_Event event, DrawingWindow &window) {
             glm::mat3 cameraRotation = glm::mat3(cos(radianx), 0, -sin(radianx), 0, 1, 0, sin(radianx), 0, cos(radianx));
             cameraPosition = cameraPosition * cameraRotation;
             Rotation = Rotation * cameraRotation;   
-            float focalLength = 2.0;
-            auto modelTriangles = objReader("cornell-box.obj", "cornell-box.mtl", 0.35);
             Rasterised(window, modelTriangles, cameraPosition, Rotation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));  
         } else if (event.key.keysym.sym == SDLK_z) {
             //downwards
@@ -705,8 +693,6 @@ void handleEvent(SDL_Event event, DrawingWindow &window) {
             glm::mat3 cameraRotation = glm::mat3(1, 0, 0, 0, cos(radiany), sin(radiany), 0, -sin(radiany), cos(radiany));
             cameraPosition = cameraPosition * cameraRotation;
             Rotation = Rotation * cameraRotation;
-            float focalLength = 2.0;
-            auto modelTriangles = objReader("cornell-box.obj", "cornell-box.mtl", 0.35);
             Rasterised(window, modelTriangles, cameraPosition, Rotation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
         } else if (event.key.keysym.sym == SDLK_x) {
             //upwards
@@ -717,27 +703,44 @@ void handleEvent(SDL_Event event, DrawingWindow &window) {
             glm::mat3 cameraRotation = glm::mat3(1, 0, 0, 0, cos(radiany), -sin(radiany), 0, sin(radiany), cos(radiany));
             cameraPosition = cameraPosition * cameraRotation;
             Rotation = Rotation * cameraRotation;
-            float focalLength = 2.0;
-            auto modelTriangles = objReader("cornell-box.obj", "cornell-box.mtl", 0.35);
             Rasterised(window, modelTriangles, cameraPosition, Rotation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
         } else if (event.key.keysym.sym == SDLK_r) {
-            float focalLength = 2.0;
-            auto modelTriangles = objReader("cornell-box.obj", "cornell-box.mtl", 0.35);
             drawRasterisedScene(window, modelTriangles, cameraPosition, focalLength, float(HEIGHT)*2/3);
         } else if (event.key.keysym.sym == SDLK_t) {
-            glm::vec3 lightposition = glm::vec3(0.0, 0.5, 0.0);
-            float focalLength = 2.0;
-            auto modelTriangles = objReader("cornell-box.obj", "cornell-box.mtl", 0.35);
             drawRasterisedShadowScene(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
         } else if (event.key.keysym.sym == SDLK_y) {
-            glm::vec3 lightposition = glm::vec3(0.0, 0.4, 0.3);
-            float focalLength = 2.0;
-            auto modelTriangles = objReader("cornell-box.obj", "cornell-box.mtl", 0.35); 
             drawIncidence(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
         } else if (event.key.keysym.sym == SDLK_m) {
-            glm::vec3 lightposition = glm::vec3(0.0, 0.4, 0.3);
-            float focalLength = 2.0;
-            auto modelTriangles = objReader("cornell-box.obj", "cornell-box.mtl", 0.35); 
+            drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
+        } else if (event.key.keysym.sym == SDLK_1) {
+            window.clearPixels();
+            clearDepthBuffer();
+            lightposition.x += 0.05;
+            drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
+        } else if (event.key.keysym.sym == SDLK_2) {
+            window.clearPixels();
+            clearDepthBuffer();
+            lightposition.x -= 0.05;
+            drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
+        } else if (event.key.keysym.sym == SDLK_3) {
+            window.clearPixels();
+            clearDepthBuffer();
+            lightposition.y += 0.05;
+            drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
+        } else if (event.key.keysym.sym == SDLK_4) {
+            window.clearPixels();
+            clearDepthBuffer();
+            lightposition.y -= 0.05;
+            drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
+        } else if (event.key.keysym.sym == SDLK_5) {
+            window.clearPixels();
+            clearDepthBuffer();
+            lightposition.z += 0.05; 
+            drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
+        } else if (event.key.keysym.sym == SDLK_6) {
+            window.clearPixels();
+            clearDepthBuffer();
+            lightposition.z -= 0.05;
             drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
         } else if (event.key.keysym.sym == SDLK_c) {
             clearDepthBuffer();
