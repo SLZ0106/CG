@@ -557,6 +557,10 @@ void drawRasterisedShadowScene(DrawingWindow &window, const std::vector<ModelTri
     int red;
     int green;
     int blue;
+<<<<<<< HEAD
+=======
+    lightpoints = MultiLight(lightPosition, 3, 0.0);
+>>>>>>> parent of e4878b3 (return to old version)
     for(int y = 0; y < HEIGHT; y++) {
         for(int x = 0; x < WIDTH; x++) {
             CanvasPoint point = CanvasPoint(float(x), float(y));
@@ -568,6 +572,10 @@ void drawRasterisedShadowScene(DrawingWindow &window, const std::vector<ModelTri
             glm::vec3 lightDirection = closestIntersection.intersectionPoint - lightPosition;
             float intensity = S /(4*3.1415*glm::length(lightDirection)*glm::length(lightDirection));
             RayTriangleIntersection lightIntersection = getClosestIntersection(modelTriangles, lightPosition, lightDirection);
+<<<<<<< HEAD
+=======
+            float Shadowresult = 1;
+>>>>>>> parent of e4878b3 (return to old version)
             if (closestIntersection.triangleIndex != lightIntersection.triangleIndex) {
                 for (unsigned i = 0; i < lightpoints.size(); i++) {
 						glm::vec3 lRay = closestIntersection.intersectionPoint - lightpoints[i];
@@ -668,12 +676,23 @@ void drawSpecular(DrawingWindow &window, const std::vector<ModelTriangle>& model
                 }
             float Shadowresult = 0;
             if (closestIntersection.triangleIndex != lightIntersection.triangleIndex) {
+<<<<<<< HEAD
                 Shadowresult = getShadowIntersection(modelTriangles, closestIntersection.intersectionPoint, lightpoints);
                 Shadowresult = Shadowresult / float(lightpoints.size());
                 std::cout << Shadowresult << std::endl;
                 red = ((colour.red)*(1.0-Shadowresult));
                 green = ((colour.green)*(1.0-Shadowresult));
                 blue = ((colour.blue)*(1.0-Shadowresult));
+=======
+                for (unsigned i = 0; i < lightpoints.size(); i++) {
+						glm::vec3 lRay = closestIntersection.intersectionPoint - lightpoints[i];
+						RayTriangleIntersection  multiShadowIntersection = getShadowIntersection(modelTriangles, lightpoints[i], lRay);
+						if ((int)closestIntersection.triangleIndex != (int)multiShadowIntersection.triangleIndex) Shadowresult -= .02;
+					}
+                red = (colour.red*(incidenceintensity*intensity + specularintensity)+35)*Shadowresult;
+                green = (colour.red*(incidenceintensity*intensity + specularintensity)+35)*Shadowresult;
+                blue = (colour.red*(incidenceintensity*intensity + specularintensity)+35)*Shadowresult;
+>>>>>>> parent of e4878b3 (return to old version)
                 //red = 0;
                 //green = 0;
                 //blue = 0;
@@ -991,6 +1010,10 @@ void handleEvent(SDL_Event event, DrawingWindow &window) {
             window.clearPixels();
             clearDepthBuffer();
             lightposition.x += 0.05;
+<<<<<<< HEAD
+=======
+            //drawRasterisedShadowScene(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
+>>>>>>> parent of e4878b3 (return to old version)
             drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
             //drawGouraud(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
             //drawPhong(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
@@ -998,6 +1021,10 @@ void handleEvent(SDL_Event event, DrawingWindow &window) {
             window.clearPixels();
             clearDepthBuffer();
             lightposition.x -= 0.05;
+<<<<<<< HEAD
+=======
+            //drawRasterisedShadowScene(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
+>>>>>>> parent of e4878b3 (return to old version)
             drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
             //drawGouraud(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
             //drawPhong(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
@@ -1005,6 +1032,10 @@ void handleEvent(SDL_Event event, DrawingWindow &window) {
             window.clearPixels();
             clearDepthBuffer();
             lightposition.y += 0.05;
+<<<<<<< HEAD
+=======
+            //drawRasterisedShadowScene(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
+>>>>>>> parent of e4878b3 (return to old version)
             drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
             //drawGouraud(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
             //drawPhong(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
@@ -1012,6 +1043,10 @@ void handleEvent(SDL_Event event, DrawingWindow &window) {
             window.clearPixels();
             clearDepthBuffer();
             lightposition.y -= 0.05;
+<<<<<<< HEAD
+=======
+            //drawRasterisedShadowScene(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
+>>>>>>> parent of e4878b3 (return to old version)
             drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
             //drawGouraud(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
             //drawPhong(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
@@ -1019,6 +1054,10 @@ void handleEvent(SDL_Event event, DrawingWindow &window) {
             window.clearPixels();
             clearDepthBuffer();
             lightposition.z += 0.05; 
+<<<<<<< HEAD
+=======
+            //drawRasterisedShadowScene(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
+>>>>>>> parent of e4878b3 (return to old version)
             drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
             //drawGouraud(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
             //drawPhong(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
@@ -1026,6 +1065,10 @@ void handleEvent(SDL_Event event, DrawingWindow &window) {
             window.clearPixels();
             clearDepthBuffer();
             lightposition.z -= 0.05;
+<<<<<<< HEAD
+=======
+            //drawRasterisedShadowScene(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
+>>>>>>> parent of e4878b3 (return to old version)
             drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
             //drawGouraud(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
             //drawPhong(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
