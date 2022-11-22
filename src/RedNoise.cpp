@@ -503,6 +503,22 @@ RayTriangleIntersection getClosestIntersection(const std::vector<ModelTriangle> 
 //    }
 }
 
+bool IfShadow(const std::vector<ModelTriangle> triangles, glm::vec3 point){
+    glm::vec3 rayDirection = glm::normalize(lightposition - point);
+    float distance = glm::distance(lightposition, point);
+    for(size_t i = 0; i < triangles.size(); i++) {
+        glm::vec3 e0 = triangles[i].vertices[1] - triangles[i].vertices[0];
+        glm::vec3 e1 = triangles[i].vertices[2] - triangles[i].vertices[0];
+        glm::vec3 SPVector = cameraPosition - triangles[i].vertices[0];
+        glm::mat3 DEMatrix(-rayDirection, e0, e1);
+        glm::vec3 possibleSolution = glm::inverse(DEMatrix) * SPVector;
+        if(possibleSolution[0] <= distance && possibleSolution[0] >= 0.00001 && possibleSolution[1] >= 0 && possibleSolution[1] <= 1 && possibleSolution[2] >= 0 && possibleSolution[2] <= 1 && (possibleSolution[1] + possibleSolution[2]) <= 1){
+            return true;
+        }
+    }
+    return false;
+}
+
 float getShadowIntersection(const std::vector<ModelTriangle> triangles, glm::vec3 point, std::vector<glm::vec3> lightpoints){
     int result = 0; 
     for (unsigned i = 0; i < lightpoints.size(); i++) {
@@ -635,7 +651,7 @@ void drawSpecular(DrawingWindow &window, const std::vector<ModelTriangle>& model
     int red;
     int green;
     int blue;
-    std::vector<glm::vec3> lightpoints = MultiLight(lightPosition, 5);
+    std::vector<glm::vec3> lightpoints = MultiLight(lightPosition, 2);
     for(int y = 0; y < HEIGHT; y++) {
         for(int x = 0; x < WIDTH; x++) {
             CanvasPoint point = CanvasPoint(float(x), float(y));
@@ -663,7 +679,6 @@ void drawSpecular(DrawingWindow &window, const std::vector<ModelTriangle>& model
             if (closestIntersection.triangleIndex != lightIntersection.triangleIndex) {
                 Shadowresult = getShadowIntersection(modelTriangles, closestIntersection.intersectionPoint, lightpoints);
                 Shadowresult = Shadowresult / float(lightpoints.size());
-                std::cout << Shadowresult << std::endl;
                 red = ((colour.red)*(1.0-Shadowresult));
                 green = ((colour.green)*(1.0-Shadowresult));
                 blue = ((colour.blue)*(1.0-Shadowresult));
