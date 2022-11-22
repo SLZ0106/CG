@@ -525,25 +525,23 @@ bool IfShadow(const std::vector<ModelTriangle> triangles, glm::vec3 point){
     return false;
 }
 
-float getShadowIntersection(const std::vector<ModelTriangle> triangles, glm::vec3 point, std::vector<glm::vec3> lightpoints){
-    int result = 0; 
-    for (unsigned i = 0; i < lightpoints.size(); i++) {
-        glm::vec3 lightDirection1 = glm::normalize(lightpoints[i] - point);
-        float distance = glm::distance(lightpoints[i], point);
-        for (unsigned j = 0; j < triangles.size(); j++) {
-            ModelTriangle triangle = triangles[j];
-            glm::vec3 e0 = triangle.vertices[1] - triangle.vertices[0];
-            glm::vec3 e1 = triangle.vertices[2] - triangle.vertices[0];
-            glm::vec3 SPVector = point - triangle.vertices[0];
-            glm::mat3 DEMatrix(-lightDirection1, e0, e1);
-            glm::vec3 possibleSolution = glm::inverse(DEMatrix) * SPVector;
-            if(possibleSolution[0] < distance && possibleSolution[0] > 0.00001 && possibleSolution[1] >= 0 && possibleSolution[1] <= 1 && possibleSolution[2] >= 0 && possibleSolution[2] <= 1 && (possibleSolution[1] + possibleSolution[2]) <= 1){
-                result ++;
-                break;
-            }
-        }
-    }
-    return result;
+RayTriangleIntersection getShadowIntersection(const std::vector<ModelTriangle> modelTriangles, glm::vec3 cameraPosition, glm::vec3 rayDirection){
+    RayTriangleIntersection closest = RayTriangleIntersection(glm::vec3(), 999999, ModelTriangle(), 0); 
+	for (unsigned i = 0; i < modelTriangles.size(); i++) {
+		glm::vec3 e0 = modelTriangles[i].vertices[1] - modelTriangles[i].vertices[0];
+		glm::vec3 e1 = modelTriangles[i].vertices[2] - modelTriangles[i].vertices[0];
+		glm::vec3 SPVector = cameraPosition - modelTriangles[i].vertices[0];
+		glm::mat3 DEMatrix(-rayDirection, e0, e1);
+		glm::vec3 possibleSolution = glm::inverse(DEMatrix) * SPVector;
+		float u = possibleSolution.y;
+		float v = possibleSolution.z;
+		if (possibleSolution.x < closest.distanceFromCamera && (u >= 0.0) && (u <= 1.0) && (v >= 0.0) && (v <= 1.0) && (u + v) <= 1.0 && possibleSolution.x > 0) {
+			glm::vec3 point = cameraPosition + rayDirection * possibleSolution.x;
+			closest = RayTriangleIntersection(point, possibleSolution.x, modelTriangles[i], i);
+			closest.triangleIndex = i;
+		}
+	}
+	return closest;
 }
 
 glm::vec3 get3DPoint(CanvasPoint point, glm::vec3 cameraPosition, float focalLength, float scalingFactor) {
@@ -561,13 +559,13 @@ std::vector<glm::vec3> MultiLight(glm::vec3 center, int num, float spread) {
     float y = center.y;
     float z = center.z;
     std::vector<glm::vec3> lightPosition;
-    //for (int i = -num; i <= num; i++){
-    //    for (int j = -num; j <= num; j++){
-    //        if(fabs(i) + fabs(j) <= num){
-    //            lightPosition.push_back(glm::vec3(x + i * spread, y, z + j * spread));
-    //        }
-    //    }
-    //}
+    for (int i = -num; i <= num; i++){
+        for (int j = -num; j <= num; j++){
+            if(fabs(i) + fabs(j) <= num){
+                lightPosition.push_back(glm::vec3(x + i * spread, y, z + j * spread));
+            }
+        }
+    }
     return lightPosition;
 }
 
@@ -596,7 +594,7 @@ void drawRasterisedShadowScene(DrawingWindow &window, const std::vector<ModelTri
     int red;
     int green;
     int blue;
-    lightpoints = MultiLight(lightPosition, 4, 0.02);
+    lightpoints = MultiLight(lightPosition, 3, 0.05);
     for(int y = 0; y < HEIGHT; y++) {
         for(int x = 0; x < WIDTH; x++) {
             CanvasPoint point = CanvasPoint(float(x), float(y));
@@ -608,14 +606,17 @@ void drawRasterisedShadowScene(DrawingWindow &window, const std::vector<ModelTri
             glm::vec3 lightDirection = glm::normalize(closestIntersection.intersectionPoint - lightPosition);
             //float intensity = S /(4*3.1415*glm::length(lightDirection)*glm::length(lightDirection));
             RayTriangleIntersection lightIntersection = getClosestIntersection(modelTriangles, lightPosition, lightDirection);
-            std::cout<<glm::to_string(lightIntersection.intersectionPoint)<<std::endl;
             float Shadowresult = 0;
             if (closestIntersection.triangleIndex != lightIntersection.triangleIndex) {
-                Shadowresult = getShadowIntersection(modelTriangles, closestIntersection.intersectionPoint, lightpoints);
-                Shadowresult = Shadowresult / float(lightpoints.size());
-                red = ((colour.red)*(1.0-Shadowresult));
-                green = ((colour.red)*(1.0-Shadowresult));
-                blue = ((colour.red)*(1.0-Shadowresult));
+                float shadowValue = 1;
+                for (unsigned i = 0; i < lightpoints.size(); i++) {
+						glm::vec3 lRay = closestIntersection.intersectionPoint - lightpoints[i];
+						RayTriangleIntersection  multiShadowIntersection = getShadowIntersection(modelTriangles, lightpoints[i], lRay);
+						if ((int)closestIntersection.triangleIndex != (int)multiShadowIntersection.triangleIndex) shadowValue -= .02;
+					}
+                red = ((colour.red)*(Shadowresult));
+                green = ((colour.red)*(Shadowresult));
+                blue = ((colour.red)*(Shadowresult));
             }else{
                 Colour colour = closestIntersection.intersectedTriangle.colour;
                 red = fmin(colour.red, 255);
@@ -822,17 +823,14 @@ void drawPhong(DrawingWindow &window, const std::vector<ModelTriangle>& modelTri
             glm::vec3 rayDirection = glm::normalize(threeDPoint - cameraPosition);
             int S = 16;
             RayTriangleIntersection closestIntersection = getClosestIntersection(modelTriangles, cameraPosition, rayDirection);
-            float shadowvalue = 0.3;
-            for (unsigned k = 0; k < lightpoints.size(); k++){
-                glm::vec3 lightDirection = closestIntersection.intersectionPoint - lightpoints[k];
-                RayTriangleIntersection multlightIntersection = getClosestIntersection(modelTriangles, lightpoints[k], lightDirection);
-                if (closestIntersection.triangleIndex != multlightIntersection.triangleIndex){
-                    shadowvalue -=0.02;
-                }
-            }
-            if (shadowvalue <0){
-                shadowvalue = 0;
-            }
+            //float shadowvalue = 0.3;
+            //for (unsigned k = 0; k < lightpoints.size(); k++){
+            //    glm::vec3 lightDirection = closestIntersection.intersectionPoint - lightpoints[k];
+            //    RayTriangleIntersection multlightIntersection = getClosestIntersection(modelTriangles, lightpoints[k], lightDirection);
+            //    if (closestIntersection.triangleIndex != multlightIntersection.triangleIndex){
+            //        shadowvalue -=0.02;
+            //    }
+            //}
             Colour colour = closestIntersection.intersectedTriangle.colour;
             glm::vec3 lightDirection = closestIntersection.intersectionPoint - lightPosition;
             ModelTriangle triangle = closestIntersection.intersectedTriangle;
