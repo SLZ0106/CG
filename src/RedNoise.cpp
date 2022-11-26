@@ -486,7 +486,6 @@ void IntersectionSort(std::vector<RayTriangleIntersection> &intersections){
 }
 
 RayTriangleIntersection getClosestIntersection(const std::vector<ModelTriangle> triangles, glm::vec3 cameraPosition, glm::vec3 rayDirection){
-    std::vector<RayTriangleIntersection> intersections;
     RayTriangleIntersection closestIntersection;
     closestIntersection.distanceFromCamera = FLT_MAX;
     for(size_t i = 0; i < triangles.size(); i++) {
@@ -498,34 +497,46 @@ RayTriangleIntersection getClosestIntersection(const std::vector<ModelTriangle> 
         if(possibleSolution[0] <= closestIntersection.distanceFromCamera && possibleSolution[0] >= 0.00001 && possibleSolution[1] >= 0 && possibleSolution[1] <= 1 && possibleSolution[2] >= 0 && possibleSolution[2] <= 1 && (possibleSolution[1] + possibleSolution[2]) <= 1){
             glm::vec3 intersectionPoint = cameraPosition + possibleSolution[0] * rayDirection;
             closestIntersection = RayTriangleIntersection(intersectionPoint, possibleSolution[0], triangles[i], i);
-            intersections.push_back(closestIntersection);
+            closestIntersection.triangleIndex = i;
         }
     }
-    if (intersections.size() == 0) {
-        return closestIntersection;
-    }else{
-        IntersectionSort(intersections);
-        return intersections[0];
-    }
+    return closestIntersection;
 }
 
 RayTriangleIntersection getShadowIntersection(const std::vector<ModelTriangle> modelTriangles, glm::vec3 cameraPosition, glm::vec3 rayDirection){
-    RayTriangleIntersection closest = RayTriangleIntersection(glm::vec3(), 999999, ModelTriangle(), 0); 
+    RayTriangleIntersection closest;
+    closest.distanceFromCamera = FLT_MAX; 
 	for (unsigned i = 0; i < modelTriangles.size(); i++) {
 		glm::vec3 e0 = modelTriangles[i].vertices[1] - modelTriangles[i].vertices[0];
 		glm::vec3 e1 = modelTriangles[i].vertices[2] - modelTriangles[i].vertices[0];
 		glm::vec3 SPVector = cameraPosition - modelTriangles[i].vertices[0];
 		glm::mat3 DEMatrix(-rayDirection, e0, e1);
 		glm::vec3 possibleSolution = glm::inverse(DEMatrix) * SPVector;
-		float u = possibleSolution.y;
-		float v = possibleSolution.z;
-		if (possibleSolution.x < closest.distanceFromCamera && (u >= 0.0) && (u <= 1.0) && (v >= 0.0) && (v <= 1.0) && (u + v) <= 1.0 && possibleSolution.x > 0.0001) {
-			glm::vec3 point = cameraPosition + rayDirection * possibleSolution.x;
-			closest = RayTriangleIntersection(point, possibleSolution.x, modelTriangles[i], i);
+		if(possibleSolution[0] <= closest.distanceFromCamera && possibleSolution[0] >= 0.00001 && possibleSolution[1] >= 0 && possibleSolution[1] <= 1 && possibleSolution[2] >= 0 && possibleSolution[2] <= 1 && (possibleSolution[1] + possibleSolution[2]) <= 1) {
+			glm::vec3 point = cameraPosition + possibleSolution[0] * rayDirection;
+			closest = RayTriangleIntersection(point, possibleSolution[0], modelTriangles[i], i);
 			closest.triangleIndex = i;
 		}
 	}
 	return closest;
+}
+
+RayTriangleIntersection getReflectionIntersection(const std::vector<ModelTriangle> modelTriangles, glm::vec3 cameraPosition, glm::vec3 rayDirection){
+    RayTriangleIntersection closest;
+    closest.distanceFromCamera = FLT_MAX; 
+    for (unsigned i = 0; i < modelTriangles.size(); i++) {
+        glm::vec3 e0 = modelTriangles[i].vertices[1] - modelTriangles[i].vertices[0];
+        glm::vec3 e1 = modelTriangles[i].vertices[2] - modelTriangles[i].vertices[0];
+        glm::vec3 SPVector = cameraPosition - modelTriangles[i].vertices[0];
+        glm::mat3 DEMatrix(-rayDirection, e0, e1);
+        glm::vec3 possibleSolution = glm::inverse(DEMatrix) * SPVector;
+        if(possibleSolution[0] <= closest.distanceFromCamera && possibleSolution[0] >= 0.00001 && possibleSolution[1] >= 0 && possibleSolution[1] <= 1 && possibleSolution[2] >= 0 && possibleSolution[2] <= 1 && (possibleSolution[1] + possibleSolution[2]) <= 1) {
+            glm::vec3 point = cameraPosition + possibleSolution[0] * rayDirection;
+            closest = RayTriangleIntersection(point, possibleSolution[0], modelTriangles[i], i);
+            closest.triangleIndex = i;
+        }
+    }
+    return closest;
 }
 
 glm::vec3 get3DPoint(CanvasPoint point, glm::vec3 cameraPosition, float focalLength, float scalingFactor) {
@@ -578,7 +589,6 @@ void drawRasterisedShadowScene(DrawingWindow &window, const std::vector<ModelTri
     int red;
     int green;
     int blue;
-    lightpoints = MultiLight(lightPosition, 4, 0.02);
     for(int y = 0; y < HEIGHT; y++) {
         for(int x = 0; x < WIDTH; x++) {
             CanvasPoint point = CanvasPoint(float(x), float(y));
@@ -587,25 +597,30 @@ void drawRasterisedShadowScene(DrawingWindow &window, const std::vector<ModelTri
             glm::vec3 rayDirection = glm::normalize(threeDPoint - cameraPosition);
             RayTriangleIntersection closestIntersection = getClosestIntersection(modelTriangles, cameraPosition, rayDirection);
             Colour colour = closestIntersection.intersectedTriangle.colour;
+            glm::vec3 view = glm::normalize(closestIntersection.intersectionPoint- cameraPosition);
             glm::vec3 lightDirection = glm::normalize(closestIntersection.intersectionPoint - lightPosition);
+            glm::vec3 normal = glm::normalize(closestIntersection.intersectedTriangle.normal);
+            glm::vec3 reflection = glm::normalize(view - 2.0f * glm::dot(view, normal) * normal);
             //float intensity = S /(4*3.1415*glm::length(lightDirection)*glm::length(lightDirection));
             RayTriangleIntersection lightIntersection = getClosestIntersection(modelTriangles, lightPosition, lightDirection);
-            float Shadowresult = 0.7;
+            std::cout <<closestIntersection.intersectedTriangle.colour.name << std::endl;
             if (closestIntersection.triangleIndex != lightIntersection.triangleIndex) {
-                for (unsigned i = 0; i < lightpoints.size(); i++) {
-						glm::vec3 lRay = closestIntersection.intersectionPoint - lightpoints[i];
-						RayTriangleIntersection multiShadowIntersection = getShadowIntersection(modelTriangles, lightpoints[i], lRay);
-                        std::cout << multiShadowIntersection.triangleIndex << std::endl;
-						if ((int)closestIntersection.triangleIndex != (int)multiShadowIntersection.triangleIndex) Shadowresult -= .02;
-					}
-                red = ((colour.red)*(Shadowresult));
-                green = ((colour.red)*(Shadowresult));
-                blue = ((colour.red)*(Shadowresult));
+                red = ((colour.red)*0.3);
+                green = ((colour.red)*0.3);
+                blue = ((colour.red)*0.3);
             }else{
-                Colour colour = closestIntersection.intersectedTriangle.colour;
-                red = fmin(colour.red, 255);
-                green = fmin(colour.green, 255);
-                blue = fmin(colour.blue, 255);
+                    if(closestIntersection.intersectedTriangle.colour.name == "Yellow"){
+                    RayTriangleIntersection reflectionIntersection = getReflectionIntersection(modelTriangles, closestIntersection.intersectionPoint, reflection);
+                    Colour colour = closestIntersection.intersectedTriangle.colour;
+                    red = fmin(colour.red*0.8f, 255);
+                    green = fmin(colour.green*0.8f, 255);
+                    blue = fmin(colour.blue*0.8f, 255);
+                }else{
+                    Colour colour = closestIntersection.intersectedTriangle.colour;
+                    red = fmin(colour.red, 255);
+                    green = fmin(colour.green, 255);
+                    blue = fmin(colour.blue, 255);
+                }
             }
             uint32_t c = (255 << 24) + (red << 16) + (green << 8) + (blue);
             window.setPixelColour(x, y, c);
@@ -650,6 +665,7 @@ void drawSpecular(DrawingWindow &window, const std::vector<ModelTriangle>& model
     int red;
     int green;
     int blue;
+    lightpoints = MultiLight(lightPosition, 3, 0.03);
     for(int y = 0; y < HEIGHT; y++) {
         for(int x = 0; x < WIDTH; x++) {
             CanvasPoint point = CanvasPoint(float(x), float(y));
@@ -662,21 +678,27 @@ void drawSpecular(DrawingWindow &window, const std::vector<ModelTriangle>& model
             ModelTriangle triangle = closestIntersection.intersectedTriangle;
             float intensity = S /(4*3.1415*glm::length(lightDirection)*glm::length(lightDirection));
             glm::vec3 reflection = glm::normalize(lightDirection - (2*glm::dot(lightDirection, triangle.normal)*triangle.normal));
-            glm::vec3 view = glm::normalize(cameraPosition - closestIntersection.intersectionPoint);
+            glm::vec3 view = glm::normalize(closestIntersection.intersectionPoint- cameraPosition);
             float specularintensity = glm::dot(view, reflection);
             specularintensity = pow(specularintensity, 64);
             float incidenceintensity = glm::clamp<float>(glm::dot(triangle.normal, -lightDirection), 0.0, 1.0);
             RayTriangleIntersection lightIntersection = getClosestIntersection(modelTriangles, lightPosition, lightDirection);
             Colour Background = Colour(0,0,0);
+            float Shadowresult = 0.7;
             if (closestIntersection.distanceFromCamera ==FLT_MAX){
                     uint32_t backgroundc = (255 << 24) + (Background.red << 16) + (Background.green << 8) + (Background.blue);
                     window.setPixelColour(x, y, backgroundc);
                     continue;
                 }
             if (closestIntersection.triangleIndex != lightIntersection.triangleIndex) {
-                red = (colour.red*(incidenceintensity*intensity + specularintensity)+35)*0.3;
-                green = (colour.red*(incidenceintensity*intensity + specularintensity)+35)*0.3;
-                blue = (colour.red*(incidenceintensity*intensity + specularintensity)+35)*0.3;
+                for (unsigned i = 0; i < lightpoints.size(); i++) {
+						glm::vec3 lRay = glm::normalize(closestIntersection.intersectionPoint - lightpoints[i]);
+						RayTriangleIntersection multiShadowIntersection = getShadowIntersection(modelTriangles, lightpoints[i], lRay);
+						if (closestIntersection.triangleIndex != multiShadowIntersection.triangleIndex) Shadowresult -= 0.02;
+					}
+                    red = (colour.red*(incidenceintensity*intensity + specularintensity)+35)*Shadowresult;
+                    green = (colour.red*(incidenceintensity*intensity + specularintensity)+35)*Shadowresult;
+                    blue = (colour.red*(incidenceintensity*intensity + specularintensity)+35)*Shadowresult;
                 //red = 0;
                 //green = 0;
                 //blue = 0;
@@ -714,21 +736,21 @@ void drawGouraud(DrawingWindow &window, const std::vector<ModelTriangle>& modelT
         for(int x = 0; x < WIDTH; x++) {
             CanvasPoint point = CanvasPoint(float(x), float(y));
             glm::vec3 threeDPoint = get3DPoint(point, cameraPosition, focalLength, scalingFactor);
-            glm::vec3 rayDirection = threeDPoint - cameraPosition;
+            glm::vec3 rayDirection = glm::normalize(threeDPoint - cameraPosition);
             RayTriangleIntersection closestIntersection = getClosestIntersection(modelTriangles, cameraPosition, rayDirection);
             Colour colour = closestIntersection.intersectedTriangle.colour;
             glm::vec3 lightDirection = glm::normalize(closestIntersection.intersectionPoint - lightPosition);
             ModelTriangle triangle = closestIntersection.intersectedTriangle;
-            glm::vec3 view = glm::normalize(closestIntersection.intersectionPoint - cameraPosition);
+            glm::vec3 view = glm::normalize(closestIntersection.intersectionPoint- cameraPosition);
             glm::vec3 pointA = closestIntersection.intersectedTriangle.vertices[0];
             glm::vec3 pointB = closestIntersection.intersectedTriangle.vertices[1];
             glm::vec3 pointC = closestIntersection.intersectedTriangle.vertices[2];
             glm::vec3 n1 = NormalCalculator(pointA, modelTriangles);
             glm::vec3 n2 = NormalCalculator(pointB, modelTriangles);
             glm::vec3 n3 = NormalCalculator(pointC, modelTriangles);
-            glm::vec3 lightDirection1 = lightPosition - n1;
-            glm::vec3 lightDirection2 = lightPosition - n2;
-            glm::vec3 lightDirection3 = lightPosition - n3;
+            glm::vec3 lightDirection1 = glm::normalize(lightPosition - n1);
+            glm::vec3 lightDirection2 = glm::normalize(lightPosition - n2);
+            glm::vec3 lightDirection3 = glm::normalize(lightPosition - n3);
             float l1,l2,l3;
                 if (pointA.x == pointB.x && pointB.x == pointC.x){
                     float det = ((pointB.z - pointC.z) * (pointA.y - pointC.y)) - ((pointC.z - pointB.z) * (pointA.y - pointC.y));
@@ -749,9 +771,9 @@ void drawGouraud(DrawingWindow &window, const std::vector<ModelTriangle>& modelT
             float incidenceintensity1 = glm::clamp<float>(glm::dot(n1, -lightDirection), 0.0, 1.0);
             float incidenceintensity2 = glm::clamp<float>(glm::dot(n2, -lightDirection), 0.0, 1.0);
             float incidenceintensity3 = glm::clamp<float>(glm::dot(n3, -lightDirection), 0.0, 1.0);
-            glm::vec3 reflection1 = glm::normalize(lightDirection - (2*glm::dot(lightDirection, n1)*n1));
-            glm::vec3 reflection2 = glm::normalize(lightDirection - (2*glm::dot(lightDirection, n2)*n2));
-            glm::vec3 reflection3 = glm::normalize(lightDirection - (2*glm::dot(lightDirection, n3)*n3));
+            glm::vec3 reflection1 = glm::normalize(lightDirection - (2.0f*n1*glm::dot(lightDirection, n1)));
+            glm::vec3 reflection2 = glm::normalize(lightDirection - (2.0f*n2*glm::dot(lightDirection, n2)));
+            glm::vec3 reflection3 = glm::normalize(lightDirection - (2.0f*n3*glm::dot(lightDirection, n3)));
             float specularintensity1 = glm::dot(view, reflection1);
             float specularintensity2 = glm::dot(view, reflection2);
             float specularintensity3 = glm::dot(view, reflection3);
@@ -799,27 +821,15 @@ void drawPhong(DrawingWindow &window, const std::vector<ModelTriangle>& modelTri
     int red;
     int green;
     int blue;
-    std::vector<glm::vec3> lightpoints = MultiLight(lightPosition, 2, 0.01);
     for(int y = 0; y < HEIGHT; y++) {
         for(int x = 0; x < WIDTH; x++) {
+            int S = 16;
             CanvasPoint point = CanvasPoint(float(x), float(y));
             glm::vec3 threeDPoint = get3DPoint(point, cameraPosition, focalLength, scalingFactor);
             glm::vec3 rayDirection = glm::normalize(threeDPoint - cameraPosition);
-            int S = 16;
             RayTriangleIntersection closestIntersection = getClosestIntersection(modelTriangles, cameraPosition, rayDirection);
-            float shadowvalue = 0.3;
-            for (unsigned k = 0; k < lightpoints.size(); k++){
-                glm::vec3 lightDirection = closestIntersection.intersectionPoint - lightpoints[k];
-                RayTriangleIntersection multlightIntersection = getClosestIntersection(modelTriangles, lightpoints[k], lightDirection);
-                if (closestIntersection.triangleIndex != multlightIntersection.triangleIndex){
-                    shadowvalue -=0.02;
-                }
-            }
-            if (shadowvalue <0){
-                shadowvalue = 0;
-            }
             Colour colour = closestIntersection.intersectedTriangle.colour;
-            glm::vec3 lightDirection = closestIntersection.intersectionPoint - lightPosition;
+            glm::vec3 lightDirection = glm::normalize(closestIntersection.intersectionPoint - lightPosition);
             ModelTriangle triangle = closestIntersection.intersectedTriangle;
             float intensity = S /(4*3.1415*glm::length(lightDirection)*glm::length(lightDirection));
             glm::vec3 pointA = closestIntersection.intersectedTriangle.vertices[0];
@@ -845,10 +855,10 @@ void drawPhong(DrawingWindow &window, const std::vector<ModelTriangle>& modelTri
                     l2 = (((pointC.y - pointA.y) * (closestIntersection.intersectionPoint.x - pointC.x)) + ((pointA.x - pointC.x) * (closestIntersection.intersectionPoint.y - pointC.y))) / det;
                     l3 = 1 - l1 - l2;}
             glm::vec3 normal = (l1*n1) + (l2*n2) + (l3*n3);
-            glm::vec3 reflection = glm::normalize(lightDirection - (2*glm::dot(lightDirection, normal)*normal));
-            glm::vec3 view = glm::normalize(cameraPosition - closestIntersection.intersectionPoint);
+            glm::vec3 reflection = glm::normalize(lightDirection - (2.0f*normal*glm::dot(lightDirection, normal)));
+            glm::vec3 view = glm::normalize(closestIntersection.intersectionPoint- cameraPosition);
             float specularintensity = glm::dot(view, reflection);
-            specularintensity = pow(specularintensity, 64);
+            specularintensity = pow(specularintensity, 128);
             float incidenceintensity = glm::clamp<float>(glm::dot(normal, -lightDirection), 0.0, 1.0);
             RayTriangleIntersection lightIntersection = getClosestIntersection(modelTriangles, lightPosition, lightDirection);
             Colour Background = Colour(0,0,0);
@@ -997,24 +1007,24 @@ void handleEvent(SDL_Event event, DrawingWindow &window) {
             window.clearPixels();
             clearDepthBuffer();
             lightposition.x += 0.05;
-            drawRasterisedShadowScene(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
-            //drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
+            //drawRasterisedShadowScene(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
+            drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
             //drawGouraud(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
             //drawPhong(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
         } else if (event.key.keysym.sym == SDLK_2) {
             window.clearPixels();
             clearDepthBuffer();
             lightposition.x -= 0.05;
-            drawRasterisedShadowScene(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
-            //drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
+            //drawRasterisedShadowScene(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
+            drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
             //drawGouraud(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
             //drawPhong(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
         } else if (event.key.keysym.sym == SDLK_3) {
             window.clearPixels();
             clearDepthBuffer();
             lightposition.y += 0.05;
-            drawRasterisedShadowScene(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
-            //drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
+            //drawRasterisedShadowScene(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
+            drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
             //drawGouraud(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
             //drawPhong(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
         } else if (event.key.keysym.sym == SDLK_4) {
@@ -1029,16 +1039,16 @@ void handleEvent(SDL_Event event, DrawingWindow &window) {
             window.clearPixels();
             clearDepthBuffer();
             lightposition.z += 0.05; 
-            drawRasterisedShadowScene(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
-            //drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
+            //drawRasterisedShadowScene(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
+            drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
             //drawGouraud(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
             //drawPhong(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
         } else if (event.key.keysym.sym == SDLK_6) {
             window.clearPixels();
             clearDepthBuffer();
             lightposition.z -= 0.05;
-            drawRasterisedShadowScene(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
-            //drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
+            //drawRasterisedShadowScene(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
+            drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
             //drawGouraud(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
             //drawPhong(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
         } else if (event.key.keysym.sym == SDLK_n) {
