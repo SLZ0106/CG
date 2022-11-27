@@ -597,21 +597,20 @@ void drawRasterisedShadowScene(DrawingWindow &window, const std::vector<ModelTri
             glm::vec3 rayDirection = glm::normalize(threeDPoint - cameraPosition);
             RayTriangleIntersection closestIntersection = getClosestIntersection(modelTriangles, cameraPosition, rayDirection);
             Colour colour = closestIntersection.intersectedTriangle.colour;
-            glm::vec3 view = glm::normalize(closestIntersection.intersectionPoint- cameraPosition);
             glm::vec3 lightDirection = glm::normalize(closestIntersection.intersectionPoint - lightPosition);
             glm::vec3 normal = glm::normalize(closestIntersection.intersectedTriangle.normal);
-            glm::vec3 reflection = glm::normalize(view - 2.0f * glm::dot(view, normal) * normal);
+            glm::vec3 reflection = glm::normalize(rayDirection - 2.0f * glm::dot(rayDirection, normal) * normal);
             //float intensity = S /(4*3.1415*glm::length(lightDirection)*glm::length(lightDirection));
             RayTriangleIntersection lightIntersection = getClosestIntersection(modelTriangles, lightPosition, lightDirection);
-            std::cout <<closestIntersection.intersectedTriangle.colour.name << std::endl;
             if (closestIntersection.triangleIndex != lightIntersection.triangleIndex) {
                 red = ((colour.red)*0.3);
                 green = ((colour.red)*0.3);
                 blue = ((colour.red)*0.3);
             }else{
-                    if(closestIntersection.intersectedTriangle.colour.name == "Yellow"){
+                    Colour yellowcolour = Colour(255, 255, 0);
+                    if(closestIntersection.intersectedTriangle.colour.red == yellowcolour.red && closestIntersection.intersectedTriangle.colour.green == yellowcolour.green && closestIntersection.intersectedTriangle.colour.blue == yellowcolour.blue){
                     RayTriangleIntersection reflectionIntersection = getReflectionIntersection(modelTriangles, closestIntersection.intersectionPoint, reflection);
-                    Colour colour = closestIntersection.intersectedTriangle.colour;
+                    Colour colour = reflectionIntersection.intersectedTriangle.colour;
                     red = fmin(colour.red*0.8f, 255);
                     green = fmin(colour.green*0.8f, 255);
                     blue = fmin(colour.blue*0.8f, 255);
@@ -751,6 +750,8 @@ void drawGouraud(DrawingWindow &window, const std::vector<ModelTriangle>& modelT
             glm::vec3 lightDirection1 = glm::normalize(lightPosition - n1);
             glm::vec3 lightDirection2 = glm::normalize(lightPosition - n2);
             glm::vec3 lightDirection3 = glm::normalize(lightPosition - n3);
+            glm::vec3 normal = glm::normalize(closestIntersection.intersectedTriangle.normal); 
+            glm::vec3 reflection = glm::normalize(rayDirection - 2.0f * glm::dot(rayDirection, normal) * normal);
             float l1,l2,l3;
                 if (pointA.x == pointB.x && pointB.x == pointC.x){
                     float det = ((pointB.z - pointC.z) * (pointA.y - pointC.y)) - ((pointC.z - pointB.z) * (pointA.y - pointC.y));
@@ -804,12 +805,21 @@ void drawGouraud(DrawingWindow &window, const std::vector<ModelTriangle>& modelT
                 green = 0;
                 blue = 0;
             }else{
+                Colour yellowcolour = Colour(255, 255, 0);
+                if(closestIntersection.intersectedTriangle.colour.red == yellowcolour.red && closestIntersection.intersectedTriangle.colour.green == yellowcolour.green && closestIntersection.intersectedTriangle.colour.blue == yellowcolour.blue){
+                    RayTriangleIntersection reflectionIntersection = getReflectionIntersection(modelTriangles, closestIntersection.intersectionPoint, reflection);
+                    Colour colour = reflectionIntersection.intersectedTriangle.colour;
+                    red = fmin(colour.red*0.8f, 255);
+                    green = fmin(colour.green*0.8f, 255);
+                    blue = fmin(colour.blue*0.8f, 255);
                 //Plus 55 means that the colour is never black and for Ambient Lighting
-                Colour colour = closestIntersection.intersectedTriangle.colour;
+                }else{
+                    Colour colour = closestIntersection.intersectedTriangle.colour;
                 //colour = closestIntersection.intersectedTriangle.colour;
-                red = fmin(colour.red*totalinternsity,255);
-                green = fmin(colour.green*totalinternsity,255);
-                blue = fmin(colour.blue*totalinternsity,255);
+                    red = fmin(colour.red*totalinternsity,255);
+                    green = fmin(colour.green*totalinternsity,255);
+                    blue = fmin(colour.blue*totalinternsity,255);
+                }
             }
             uint32_t c = (255 << 24) + (red << 16) + (green << 8) + (blue);
             window.setPixelColour(x, y, c);
