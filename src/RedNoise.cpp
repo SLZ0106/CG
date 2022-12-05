@@ -745,7 +745,6 @@ glm::vec3 allRayColour(const std::vector<ModelTriangle>& modelTriangles, glm::ve
     }
     Colour Background = Colour(0,0,0);
     if (closestIntersection.distanceFromCamera ==FLT_MAX){
-        uint32_t backgroundc = (255 << 24) + (Background.red << 16) + (Background.green << 8) + (Background.blue);
         return glm::vec3(Background.red, Background.green, Background.blue);
     }
     if (shadingfactor == 1){
@@ -764,15 +763,15 @@ glm::vec3 allRayColour(const std::vector<ModelTriangle>& modelTriangles, glm::ve
         glm::vec3 viewA = glm::normalize(pointA-cameraPosition);
         glm::vec3 viewB = glm::normalize(pointB-cameraPosition);
         glm::vec3 viewC = glm::normalize(pointC-cameraPosition);
-        float incidenceintensity1 = glm::clamp<float>(glm::dot(n1, -lightDirection1), 0.0, 1.0);
-        float incidenceintensity2 = glm::clamp<float>(glm::dot(n2, -lightDirection2), 0.0, 1.0);
-        float incidenceintensity3 = glm::clamp<float>(glm::dot(n3, -lightDirection3), 0.0, 1.0);
-        glm::vec3 reflection1 = glm::normalize(lightDirection1 - (2.0f*n1*glm::dot(lightDirection1, n1)));
-        glm::vec3 reflection2 = glm::normalize(lightDirection2 - (2.0f*n2*glm::dot(lightDirection2, n2)));
-        glm::vec3 reflection3 = glm::normalize(lightDirection3 - (2.0f*n3*glm::dot(lightDirection3, n3)));
-        float specularintensity1 = glm::dot(viewA, reflection1);
-        float specularintensity2 = glm::dot(viewB, reflection2);
-        float specularintensity3 = glm::dot(viewC, reflection3);
+        float incidenceintensity1 = glm::clamp<float>(glm::dot(n1, lightDirection1), 0.0, 1.0);
+        float incidenceintensity2 = glm::clamp<float>(glm::dot(n2, lightDirection2), 0.0, 1.0);
+        float incidenceintensity3 = glm::clamp<float>(glm::dot(n3, lightDirection3), 0.0, 1.0);
+        glm::vec3 reflection1 = glm::normalize(lightDirection1 - (2.0f*glm::dot(lightDirection1, n1)*n1));
+        glm::vec3 reflection2 = glm::normalize(lightDirection2 - (2.0f*glm::dot(lightDirection2, n2)*n2));
+        glm::vec3 reflection3 = glm::normalize(lightDirection3 - (2.0f*glm::dot(lightDirection3, n3)*n3));
+        float specularintensity1 = glm::dot(-viewA, reflection1);
+        float specularintensity2 = glm::dot(-viewB, reflection2);
+        float specularintensity3 = glm::dot(-viewC, reflection3);
         specularintensity1 = fabs(pow(specularintensity1, 128));
         specularintensity2 = fabs(pow(specularintensity2, 128));
         specularintensity3 = fabs(pow(specularintensity3, 128));
@@ -783,9 +782,9 @@ glm::vec3 allRayColour(const std::vector<ModelTriangle>& modelTriangles, glm::ve
         float totalintensity2 = (incidenceintensity2*intensity2 + specularintensity2);
         float totalintensity3 = (incidenceintensity3*intensity3 + specularintensity3);
         float totalinternsity = l1*totalintensity1 + l2*totalintensity2 + l3*totalintensity3;
-        red = fmin(colour.red*totalinternsity,255);
-        green = fmin(colour.green*totalinternsity,255);
-        blue = fmin(colour.blue*totalinternsity,255);
+        red = fmin(colour.red*totalinternsity+35,255);
+        green = fmin(colour.green*totalinternsity+35,255);
+        blue = fmin(colour.blue*totalinternsity+35,255);
     }else if (shadingfactor ==3)
     {
         glm::vec3 normal = (l1*n1) + (l2*n2) + (l3*n3);
