@@ -19,7 +19,7 @@
 glm::vec3 cameraPosition (0.0, 0.0, 4.0);
 glm::mat3 cameraOrientation (1, 0, 0, 0, 1, 0 ,0, 0, 1); 
 glm::mat3 Rotation(1, 0, 0, 0, 1, 0 ,0, 0, 1);
-glm::vec3 lightposition = glm::vec3(0.0, 0.5, 0);
+glm::vec3 lightposition = glm::vec3(0.0, 0.4, 0.5);
 int shadingfactor = 1;
 std::vector<glm::vec3> lightpoints;
 float focalLength = 2.0;
@@ -859,8 +859,7 @@ void drawGouraud(DrawingWindow &window, const std::vector<ModelTriangle>& modelT
             glm::vec3 n3 = NormalCalculator(pointC, modelTriangles);
             glm::vec3 lightDirection1 = glm::normalize(lightPosition - n1);
             glm::vec3 lightDirection2 = glm::normalize(lightPosition - n2);
-            glm::vec3 lightDirection3 = glm::normalize(lightPosition - n3);
-            glm::vec3 normal = glm::normalize(closestIntersection.intersectedTriangle.normal); 
+            glm::vec3 lightDirection3 = glm::normalize(lightPosition - n3); 
             float l1,l2,l3;
                 if (pointA.x == pointB.x && pointA.x == pointC.x){
                     float det = ((pointB.z - pointC.z) * (pointA.y - pointC.y)) + ((pointA.z - pointC.z) * (pointC.y - pointB.y));
