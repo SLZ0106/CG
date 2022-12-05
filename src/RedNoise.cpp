@@ -20,6 +20,7 @@ glm::vec3 cameraPosition (0.0, 0.0, 4.0);
 glm::mat3 cameraOrientation (1, 0, 0, 0, 1, 0 ,0, 0, 1); 
 glm::mat3 Rotation(1, 0, 0, 0, 1, 0 ,0, 0, 1);
 glm::vec3 lightposition = glm::vec3(0.0, 0.5, 0);
+int shadingfactor = 1;
 std::vector<glm::vec3> lightpoints;
 float focalLength = 2.0;
 float x = 0.0;
@@ -718,15 +719,78 @@ glm::vec3 allRayColour(const std::vector<ModelTriangle>& modelTriangles, glm::ve
     }
 
     int S = 16;
-    float intensity = S /(4*3.1415*glm::length(lightDirection)*glm::length(lightDirection));
-    glm::vec3 reflection = glm::normalize(lightDirection - (2*glm::dot(lightDirection, triangle.normal)*triangle.normal));
+    glm::vec3 pointA = closestIntersection.intersectedTriangle.vertices[0];
+    glm::vec3 pointB = closestIntersection.intersectedTriangle.vertices[1];
+    glm::vec3 pointC = closestIntersection.intersectedTriangle.vertices[2];
     glm::vec3 view = glm::normalize(closestIntersection.intersectionPoint- cameraPosition);
-    float specularintensity = glm::dot(view, reflection);
-    specularintensity = pow(specularintensity, 64);
-    float incidenceintensity = glm::clamp<float>(glm::dot(triangle.normal, -lightDirection), 0.0, 1.0);
-    red = fmin(colour.red*(incidenceintensity*intensity + specularintensity)+35,255);
-    green = fmin(colour.green*(incidenceintensity*intensity + specularintensity)+35,255);
-    blue = fmin(colour.blue*(incidenceintensity*intensity + specularintensity)+35,255);
+    glm::vec3 n1 = NormalCalculator(pointA, modelTriangles);
+    glm::vec3 n2 = NormalCalculator(pointB, modelTriangles);
+    glm::vec3 n3 = NormalCalculator(pointC, modelTriangles);
+    float l1,l2,l3;
+    if (pointA.x == pointB.x && pointA.x == pointC.x){
+        float det = ((pointB.z - pointC.z) * (pointA.y - pointC.y)) + ((pointA.z - pointC.z) * (pointC.y - pointB.y));
+        l1 = ((pointB.z - pointC.z) * (closestIntersection.intersectionPoint.y - pointC.y) + (pointC.y - pointB.y) * (closestIntersection.intersectionPoint.z - pointC.z)) / det;
+        l2 = ((pointC.z - pointA.z) * (closestIntersection.intersectionPoint.y - pointC.y) + (pointA.y - pointC.y) * (closestIntersection.intersectionPoint.z - pointC.z)) / det;
+        l3 = 1 - l1 - l2;
+    }else if (pointA.y == pointB.y && pointA.y == pointC.y){
+        float det = ((pointB.z - pointC.z) * (pointA.x - pointC.x)) + ((pointC.x - pointB.x) * (pointA.z - pointC.z));
+        l1 = (((pointB.z - pointC.z) * (closestIntersection.intersectionPoint.x - pointC.x)) + ((pointC.x - pointB.x) * (closestIntersection.intersectionPoint.z - pointC.z))) / det;
+        l2 = (((pointC.z - pointA.z) * (closestIntersection.intersectionPoint.x - pointC.x)) + ((pointA.x - pointC.x) * (closestIntersection.intersectionPoint.z - pointC.z))) / det;
+        l3 = 1 - l1 - l2;
+    }else{
+        float det = ((pointB.y - pointC.y) * (pointA.x - pointC.x)) + ((pointC.x - pointB.x) * (pointA.y - pointC.y));
+        l1 = (((pointB.y - pointC.y) * (closestIntersection.intersectionPoint.x - pointC.x)) + ((pointC.x - pointB.x) * (closestIntersection.intersectionPoint.y - pointC.y))) / det;
+        l2 = (((pointC.y - pointA.y) * (closestIntersection.intersectionPoint.x - pointC.x)) + ((pointA.x - pointC.x) * (closestIntersection.intersectionPoint.y - pointC.y))) / det;
+        l3 = 1 - l1 - l2;
+    }
+    if (shadingfactor == 1){
+        float intensity = S /(4*3.1415*glm::length(lightDirection)*glm::length(lightDirection));
+        glm::vec3 reflection = glm::normalize(lightDirection - (2*glm::dot(lightDirection, triangle.normal)*triangle.normal));
+        float specularintensity = glm::dot(view, reflection);
+        specularintensity = pow(specularintensity, 64);
+        float incidenceintensity = glm::clamp<float>(glm::dot(triangle.normal, -lightDirection), 0.0, 1.0);
+        red = fmin(colour.red*(incidenceintensity*intensity + specularintensity)+35,255);
+        green = fmin(colour.green*(incidenceintensity*intensity + specularintensity)+35,255);
+        blue = fmin(colour.blue*(incidenceintensity*intensity + specularintensity)+35,255);
+    }else if (shadingfactor = 2){
+        glm::vec3 lightDirection1 = glm::normalize(lightPosition - n1);
+        glm::vec3 lightDirection2 = glm::normalize(lightPosition - n2);
+        glm::vec3 lightDirection3 = glm::normalize(lightPosition - n3);
+        float incidenceintensity1 = glm::clamp<float>(glm::dot(n1, -lightDirection), 0.0, 1.0);
+        float incidenceintensity2 = glm::clamp<float>(glm::dot(n2, -lightDirection), 0.0, 1.0);
+        float incidenceintensity3 = glm::clamp<float>(glm::dot(n3, -lightDirection), 0.0, 1.0);
+        glm::vec3 reflection1 = glm::normalize(lightDirection - (2.0f*n1*glm::dot(lightDirection, n1)));
+        glm::vec3 reflection2 = glm::normalize(lightDirection - (2.0f*n2*glm::dot(lightDirection, n2)));
+        glm::vec3 reflection3 = glm::normalize(lightDirection - (2.0f*n3*glm::dot(lightDirection, n3)));
+        float specularintensity1 = glm::dot(view, reflection1);
+        float specularintensity2 = glm::dot(view, reflection2);
+        float specularintensity3 = glm::dot(view, reflection3);
+        specularintensity1 = fabs(pow(specularintensity1, 128));
+        specularintensity2 = fabs(pow(specularintensity2, 128));
+        specularintensity3 = fabs(pow(specularintensity3, 128));
+        float intensity1 = S /(4*3.1415*glm::length(lightDirection1)*glm::length(lightDirection1));
+        float intensity2 = S /(4*3.1415*glm::length(lightDirection2)*glm::length(lightDirection2));
+        float intensity3 = S /(4*3.1415*glm::length(lightDirection3)*glm::length(lightDirection3));
+        float totalintensity1 = (incidenceintensity1*intensity1 + specularintensity1);
+        float totalintensity2 = (incidenceintensity2*intensity2 + specularintensity2);
+        float totalintensity3 = (incidenceintensity3*intensity3 + specularintensity3);
+        float totalinternsity = l1*totalintensity1 + l2*totalintensity2 + l3*totalintensity3;
+        red = fmin(colour.red*totalinternsity+35,255);
+        green = fmin(colour.green*totalinternsity+35,255);
+        blue = fmin(colour.blue*totalinternsity+35,255);
+    }else if (shadingfactor ==3)
+    {
+        glm::vec3 normal = (l1*n1) + (l2*n2) + (l3*n3);
+        float intensity = S /(4*3.1415*glm::length(lightDirection)*glm::length(lightDirection));
+        glm::vec3 reflection = glm::normalize(lightDirection - (2.0f*normal*glm::dot(lightDirection, normal)));
+        float specularintensity = glm::dot(view, reflection);
+        specularintensity = pow(specularintensity, 128);
+        float incidenceintensity = glm::clamp<float>(glm::dot(normal, -lightDirection), 0.0, 1.0);
+        red = fmin(colour.red*(incidenceintensity*intensity + specularintensity)+35,255);
+        green = fmin(colour.green*(incidenceintensity*intensity + specularintensity)+35,255);
+        blue = fmin(colour.blue*(incidenceintensity*intensity + specularintensity)+35,255);
+    }
+    
     glm::vec3 originColour = glm::vec3(red, green, blue);
     
     if (ifPointInShadow(modelTriangles, closestIntersection, lightPosition) && 
@@ -1097,9 +1161,17 @@ void handleEvent(SDL_Event event, DrawingWindow &window) {
             //drawGouraud(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
             //drawPhong(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
         } else if (event.key.keysym.sym == SDLK_n) {
-            drawGouraud(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
+            window.clearPixels();
+            clearDepthBuffer();
+            //drawGouraud(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
+            shadingfactor = 2;
+            drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
         } else if (event.key.keysym.sym == SDLK_b) {
-            drawPhong(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
+            window.clearPixels();
+            clearDepthBuffer();
+            //drawPhong(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
+            shadingfactor = 3;
+            drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
         } else if (event.key.keysym.sym == SDLK_c) {
             clearDepthBuffer();
             window.clearPixels();
