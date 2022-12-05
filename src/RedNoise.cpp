@@ -743,6 +743,11 @@ glm::vec3 allRayColour(const std::vector<ModelTriangle>& modelTriangles, glm::ve
         l2 = (((pointC.y - pointA.y) * (closestIntersection.intersectionPoint.x - pointC.x)) + ((pointA.x - pointC.x) * (closestIntersection.intersectionPoint.y - pointC.y))) / det;
         l3 = 1 - l1 - l2;
     }
+    Colour Background = Colour(0,0,0);
+    if (closestIntersection.distanceFromCamera ==FLT_MAX){
+        uint32_t backgroundc = (255 << 24) + (Background.red << 16) + (Background.green << 8) + (Background.blue);
+        return glm::vec3(Background.red, Background.green, Background.blue);
+    }
     if (shadingfactor == 1){
         float intensity = S /(4*3.1415*glm::length(lightDirection)*glm::length(lightDirection));
         glm::vec3 reflection = glm::normalize(lightDirection - (2*glm::dot(lightDirection, triangle.normal)*triangle.normal));
@@ -775,9 +780,9 @@ glm::vec3 allRayColour(const std::vector<ModelTriangle>& modelTriangles, glm::ve
         float totalintensity2 = (incidenceintensity2*intensity2 + specularintensity2);
         float totalintensity3 = (incidenceintensity3*intensity3 + specularintensity3);
         float totalinternsity = l1*totalintensity1 + l2*totalintensity2 + l3*totalintensity3;
-        red = fmin(colour.red*totalinternsity+35,255);
-        green = fmin(colour.green*totalinternsity+35,255);
-        blue = fmin(colour.blue*totalinternsity+35,255);
+        red = fmin(colour.red*totalinternsity,255);
+        green = fmin(colour.green*totalinternsity,255);
+        blue = fmin(colour.blue*totalinternsity,255);
     }else if (shadingfactor ==3)
     {
         glm::vec3 normal = (l1*n1) + (l2*n2) + (l3*n3);
