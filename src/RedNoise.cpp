@@ -19,7 +19,7 @@
 glm::vec3 cameraPosition (0.0, 0.0, 4.0);
 glm::mat3 cameraOrientation (1, 0, 0, 0, 1, 0 ,0, 0, 1); 
 glm::mat3 Rotation(1, 0, 0, 0, 1, 0 ,0, 0, 1);
-glm::vec3 lightposition = glm::vec3(0.0, 0.4, 0.5);
+glm::vec3 lightposition = glm::vec3(0.0, 0.5, 0.0);
 int shadingfactor = 1;
 std::vector<glm::vec3> lightpoints;
 float focalLength = 2.0;
@@ -1004,10 +1004,10 @@ void drawPhong(DrawingWindow &window, const std::vector<ModelTriangle>& modelTri
 // ---------------------- Show in window ---------------------- //
 void handleEvent(SDL_Event event, DrawingWindow &window) {
     auto modelTriangles = objReader("textured-cornell-box.obj", "textured-cornell-box.mtl", 0.35);
-    auto modelSphere = SphereReader("sphere.obj", 0.5);
-    for (ModelTriangle triangle : modelSphere){
-        modelTriangles.push_back(triangle);
-    }
+    //auto modelSphere = SphereReader("sphere.obj", 0.5);
+    //for (ModelTriangle triangle : modelSphere){
+    //    modelTriangles.push_back(triangle);
+    //}
 	if (event.type == SDL_KEYDOWN) {
 		if (event.key.keysym.sym == SDLK_LEFT) {
             std::cout << "LEFT" << std::endl;
