@@ -66,7 +66,7 @@ void draw(DrawingWindow &window) {
 
 TextureMap getTextureMap(const std::string& image) {
     TextureMap textureMap = TextureMap(image);
-    std::cout << "width " << textureMap.width << "height " << textureMap.height << std::endl;
+    //std::cout << "width " << textureMap.width << "height " << textureMap.height << std::endl;
     return textureMap;
 }
 
@@ -200,7 +200,7 @@ uint32_t textureMapper(TextureMap textureMap, CanvasTriangle triangle, CanvasPoi
     float w = 1 - u - v;
     CanvasPoint texturePoint((u * triangle.v0().texturePoint.x + v * triangle.v1().texturePoint.x + w * triangle.v2().texturePoint.x), (u * triangle.v0().texturePoint.y + v * triangle.v1().texturePoint.y + w * triangle.v2().texturePoint.y));
     int index = int(texturePoint.y) * textureMap.width + int(texturePoint.x);
-    std::cout << "Index of texture is:" << index << " corresponds to texture point x:" << texturePoint.x << " and y: " << texturePoint.y << "\n" << std::endl;
+    //std::cout << "Index of texture is:" << index << " corresponds to texture point x:" << texturePoint.x << " and y: " << texturePoint.y << "\n" << std::endl;
     uint32_t colour = textureMap.pixels[index - 1];
     return colour;
 }
@@ -731,7 +731,7 @@ glm::vec3 allRayColour(const std::vector<ModelTriangle>& modelTriangles, glm::ve
     
     if (ifPointInShadow(modelTriangles, closestIntersection, lightPosition) && 
     closestIntersection.intersectedTriangle.colour.red == 255 && closestIntersection.intersectedTriangle.colour.green == 0 && closestIntersection.intersectedTriangle.colour.blue == 0) {
-        std::cout << 1 << std::endl;
+        //std::cout << 1 << std::endl;
         return originColour*0.2f;
     }else if (ifPointInShadow(modelTriangles, closestIntersection, lightPosition)) {
         float shadowFraction = softShadow(modelTriangles, closestIntersection, lightPosition);
@@ -933,7 +933,10 @@ void drawPhong(DrawingWindow &window, const std::vector<ModelTriangle>& modelTri
 // ---------------------- Show in window ---------------------- //
 void handleEvent(SDL_Event event, DrawingWindow &window) {
     auto modelTriangles = objReader("textured-cornell-box.obj", "textured-cornell-box.mtl", 0.35);
-    //auto modelTriangles = SphereReader("sphere.obj", 0.5);
+    auto modelSphere = SphereReader("sphere.obj", 0.5);
+    for (ModelTriangle triangle : modelSphere){
+        modelTriangles.push_back(triangle);
+    }
 	if (event.type == SDL_KEYDOWN) {
 		if (event.key.keysym.sym == SDLK_LEFT) {
             std::cout << "LEFT" << std::endl;
