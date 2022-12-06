@@ -19,7 +19,7 @@
 glm::vec3 cameraPosition (0.0, 0.0, 4.0);
 glm::mat3 cameraOrientation (1, 0, 0, 0, 1, 0 ,0, 0, 1); 
 glm::mat3 Rotation(1, 0, 0, 0, 1, 0 ,0, 0, 1);
-glm::vec3 lightposition = glm::vec3(0.0, 0.5, 0.0);
+glm::vec3 lightposition = glm::vec3(0.3, 0.5, 1.0);
 int shadingfactor = 1;
 std::vector<glm::vec3> lightpoints;
 float focalLength = 2.0;
@@ -1123,6 +1123,7 @@ void handleEvent(SDL_Event event, DrawingWindow &window) {
         } else if (event.key.keysym.sym == SDLK_1) {
             window.clearPixels();
             clearDepthBuffer();
+            shadingfactor = 2;
             lightposition.x += 0.05;
             //drawRasterisedShadowScene(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
             drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
@@ -1131,6 +1132,7 @@ void handleEvent(SDL_Event event, DrawingWindow &window) {
         } else if (event.key.keysym.sym == SDLK_2) {
             window.clearPixels();
             clearDepthBuffer();
+            shadingfactor = 2;
             lightposition.x -= 0.05;
             //drawRasterisedShadowScene(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
             drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
@@ -1139,6 +1141,7 @@ void handleEvent(SDL_Event event, DrawingWindow &window) {
         } else if (event.key.keysym.sym == SDLK_3) {
             window.clearPixels();
             clearDepthBuffer();
+            shadingfactor = 2;
             lightposition.y += 0.05;
             //drawRasterisedShadowScene(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
             drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
@@ -1147,6 +1150,7 @@ void handleEvent(SDL_Event event, DrawingWindow &window) {
         } else if (event.key.keysym.sym == SDLK_4) {
             window.clearPixels();
             clearDepthBuffer();
+            shadingfactor = 2;
             lightposition.y -= 0.05;
             //drawRasterisedShadowScene(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
             drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
@@ -1155,6 +1159,7 @@ void handleEvent(SDL_Event event, DrawingWindow &window) {
         } else if (event.key.keysym.sym == SDLK_5) {
             window.clearPixels();
             clearDepthBuffer();
+            shadingfactor = 2;
             lightposition.z += 0.05; 
             //drawRasterisedShadowScene(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
             drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
