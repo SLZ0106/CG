@@ -715,7 +715,7 @@ glm::vec3 allRayColour(const std::vector<ModelTriangle>& modelTriangles, glm::ve
 
     }
     if (closestIntersection.intersectedTriangle.colour.red == 12 && closestIntersection.intersectedTriangle.colour.green == 13 && closestIntersection.intersectedTriangle.colour.blue ==14){
-        glm::vec3 InSphere = point - SpherePoint;
+        glm::vec3 InSphere = (point - SpherePoint)/0.35;
         float j = atan2(InSphere.z, InSphere.x);
         float k = asin(InSphere.y);
         float l = 1-(j+3.14)/(2*3.14);
