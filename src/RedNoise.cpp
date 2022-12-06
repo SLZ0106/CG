@@ -734,7 +734,6 @@ glm::vec3 allRayColour(const std::vector<ModelTriangle>& modelTriangles, glm::ve
         glm::vec3 reflection = glm::normalize(rayDirection - (2*glm::dot(rayDirection, triangle.normal)*triangle.normal));
         return allRayColour(modelTriangles, closestIntersection.intersectionPoint, lightPosition, reflection, times+1);
     }
-
     if (closestIntersection.intersectedTriangle.colour.name == "Cobbles") {
         TextureMap textureMap = getTextureMap("texture.ppm");
         glm::vec3 point = closestIntersection.intersectionPoint;
@@ -1045,7 +1044,7 @@ void drawPhong(DrawingWindow &window, const std::vector<ModelTriangle>& modelTri
 // ---------------------- Show in window ---------------------- //
 void handleEvent(SDL_Event event, DrawingWindow &window) {
     auto modelTriangles = objReader("textured-cornell-box.obj", "textured-cornell-box.mtl", 0.35);
-    auto modelSphere = SphereReader("sphere.obj", 0.5);
+    auto modelSphere = SphereReader("sphere.obj", 0.35);
     for (ModelTriangle triangle : modelSphere){
         modelTriangles.push_back(triangle);
     }
