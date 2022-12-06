@@ -753,7 +753,7 @@ glm::vec3 allRayColour(const std::vector<ModelTriangle>& modelTriangles, glm::ve
         float intensity = S /(4*3.1415*glm::length(lightDirection)*glm::length(lightDirection));
         glm::vec3 reflection = glm::normalize(lightDirection - (2*glm::dot(lightDirection, triangle.normal)*triangle.normal));
         float specularintensity = glm::dot(view, reflection);
-        specularintensity = pow(specularintensity, 64);
+        specularintensity = pow(specularintensity, 256);
         float incidenceintensity = glm::clamp<float>(glm::dot(triangle.normal, -lightDirection), 0.0, 1.0);
         red = fmin(colour.red*(incidenceintensity*intensity + specularintensity)+35,255);
         green = fmin(colour.green*(incidenceintensity*intensity + specularintensity)+35,255);
@@ -774,9 +774,9 @@ glm::vec3 allRayColour(const std::vector<ModelTriangle>& modelTriangles, glm::ve
         float specularintensity1 = glm::dot(viewA, reflection1);
         float specularintensity2 = glm::dot(viewB, reflection2);
         float specularintensity3 = glm::dot(viewC, reflection3);
-        specularintensity1 = fabs(pow(specularintensity1, 128));
-        specularintensity2 = fabs(pow(specularintensity2, 128));
-        specularintensity3 = fabs(pow(specularintensity3, 128));
+        specularintensity1 = fabs(pow(specularintensity1, 256));
+        specularintensity2 = fabs(pow(specularintensity2, 256));
+        specularintensity3 = fabs(pow(specularintensity3, 256));
         float intensity1 = S /(4*3.1415*glm::length(lightDirection1)*glm::length(lightDirection1));
         float intensity2 = S /(4*3.1415*glm::length(lightDirection2)*glm::length(lightDirection2));
         float intensity3 = S /(4*3.1415*glm::length(lightDirection3)*glm::length(lightDirection3));
@@ -793,7 +793,7 @@ glm::vec3 allRayColour(const std::vector<ModelTriangle>& modelTriangles, glm::ve
         float intensity = S /(4*3.1415*glm::length(lightDirection)*glm::length(lightDirection));
         glm::vec3 reflection = glm::normalize(lightDirection - (2.0f*glm::dot(lightDirection, normal)*normal));
         float specularintensity = glm::dot(view, reflection);
-        specularintensity = pow(specularintensity, 128);
+        specularintensity = pow(specularintensity, 256);
         float incidenceintensity = glm::clamp<float>(glm::dot(normal, -lightDirection), 0.0, 1.0);
         red = fmin(colour.red*(incidenceintensity*intensity + specularintensity)+35,255);
         green = fmin(colour.green*(incidenceintensity*intensity + specularintensity)+35,255);
