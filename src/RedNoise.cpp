@@ -70,9 +70,9 @@ void draw(DrawingWindow &window) {
 void get_xyz(double x1,double y1,double z1,
              double x2,double y2,double z2,
              double x3,double y3,double z3,
-             double x4,double y4,double z4,
-             double &x,double &y,double &z)//空间四点确定球心坐标(克莱姆法则)
-{
+             double x4,double y4,double z4
+             )//空间四点确定球心坐标(克莱姆法则)
+{   double x, y, z;
     double a11,a12,a13,a21,a22,a23,a31,a32,a33,b1,b2,b3,d,d1,d2,d3;
     a11=2*(x2-x1); a12=2*(y2-y1); a13=2*(z2-z1);
     a21=2*(x3-x2); a22=2*(y3-y2); a23=2*(z3-z2);
