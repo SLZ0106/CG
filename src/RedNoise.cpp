@@ -20,6 +20,7 @@ glm::vec3 cameraPosition (0.0, 0.0, 4.0);
 glm::mat3 cameraOrientation (1, 0, 0, 0, 1, 0 ,0, 0, 1); 
 glm::mat3 Rotation(1, 0, 0, 0, 1, 0 ,0, 0, 1);
 glm::vec3 lightposition = glm::vec3(-0.3, 0.3, 1.3);
+glm::vec3 SpherePoint(0,0,0);
 int shadingfactor = 1;
 std::vector<glm::vec3> lightpoints;
 float focalLength = 2.0;
@@ -27,7 +28,7 @@ float x = 0.0;
 float y = 0.0;
 glm::vec3 newCameraPosition = cameraPosition;
 float depthBuffer[HEIGHT][WIDTH];
-int imagesequence = 7;
+int imagesequence = 49;
 
 void clearDepthBuffer(){
     for(int y = 0; y < HEIGHT; y++)
@@ -64,6 +65,29 @@ void draw(DrawingWindow &window) {
 			window.setPixelColour(x, y, colour);
 		}
 	}
+}
+
+void get_xyz(double x1,double y1,double z1,
+             double x2,double y2,double z2,
+             double x3,double y3,double z3,
+             double x4,double y4,double z4,
+             double &x,double &y,double &z)//空间四点确定球心坐标(克莱姆法则)
+{
+    double a11,a12,a13,a21,a22,a23,a31,a32,a33,b1,b2,b3,d,d1,d2,d3;
+    a11=2*(x2-x1); a12=2*(y2-y1); a13=2*(z2-z1);
+    a21=2*(x3-x2); a22=2*(y3-y2); a23=2*(z3-z2);
+    a31=2*(x4-x3); a32=2*(y4-y3); a33=2*(z4-z3);
+    b1=x2*x2-x1*x1+y2*y2-y1*y1+z2*z2-z1*z1;
+    b2=x3*x3-x2*x2+y3*y3-y2*y2+z3*z3-z2*z2;
+    b3=x4*x4-x3*x3+y4*y4-y3*y3+z4*z4-z3*z3;
+    d=a11*a22*a33+a12*a23*a31+a13*a21*a32-a11*a23*a32-a12*a21*a33-a13*a22*a31;
+    d1=b1*a22*a33+a12*a23*b3+a13*b2*a32-b1*a23*a32-a12*b2*a33-a13*a22*b3;
+    d2=a11*b2*a33+b1*a23*a31+a13*a21*b3-a11*a23*b3-b1*a21*a33-a13*b2*a31;
+    d3=a11*a22*b3+a12*b2*a31+b1*a21*a32-a11*b2*a32-a12*a21*b3-b1*a22*a31;
+    x=d1/d;
+    y=d2/d;
+    z=d3/d;
+    SpherePoint = glm::vec3(x,y,z);
 }
 
 TextureMap getTextureMap(const std::string& image) {
@@ -370,14 +394,15 @@ std::vector<ModelTriangle> SphereReader(const std::string& objFile, float scalin
         glm::vec3 v1 = vertex[std::stoi(i[1])-1];
         glm::vec3 v2 = vertex[std::stoi(i[2])-1];
         glm::vec3 normal = glm::normalize(glm::cross(v1-v0, v2-v0));
-        float red = 255.0;
-        float green = 0.0;
-        float blue = 0.0;
+        float red = 12.0;
+        float green = 13.0;
+        float blue = 14.0;
         Colour colour = Colour(int(red), int(green), int(blue));
         ModelTriangle triangle = ModelTriangle(v0*scalingFactor, v1*scalingFactor, v2*scalingFactor, colour);
         triangle.normal = normal;
         modelTriangles.push_back(triangle);
     }
+    get_xyz(vertex[0].x, vertex[0].y, vertex[0].z, vertex[10].x, vertex[10].y, vertex[10].z, vertex[20].x, vertex[20].y, vertex[20].z, vertex[30].x, vertex[30].y, vertex[30].z);
     return modelTriangles;
 }
 
@@ -637,7 +662,7 @@ glm::vec3 allRayColour(const std::vector<ModelTriangle>& modelTriangles, glm::ve
             blue = 0;
     }
 
-/*
+
     if (closestIntersection.intersectedTriangle.colour.red == 255 && closestIntersection.intersectedTriangle.colour.green == 0 && closestIntersection.intersectedTriangle.colour.blue == 0) {
         glm::vec3 incident = rayDirection;
         glm::vec3 reflection = glm::normalize(incident - (2 * dot(incident, normal) * normal));
@@ -689,8 +714,22 @@ glm::vec3 allRayColour(const std::vector<ModelTriangle>& modelTriangles, glm::ve
         return finalColour;
 
     }
-*/
-
+    if (closestIntersection.intersectedTriangle.colour.red == 12 && closestIntersection.intersectedTriangle.colour.green == 13 && closestIntersection.intersectedTriangle.colour.blue ==14){
+        glm::vec3 InSphere = point - SpherePoint;
+        float j = atan2(InSphere.z, InSphere.x);
+        float k = asin(InSphere.y);
+        float l = 1-(j+3.14)/(2*3.14);
+        float o = (k+1.57)/3.14;
+        TextureMap texturemap = getTextureMap("Heaadshot.ppm");
+        int n = int((l)*texturemap.width);
+        int m = int((1-o)*texturemap.height-0.001f);
+        uint32_t colour32 = texturemap.pixels[n+m*texturemap.width];
+        blue = colour32 & 0xff;
+        green = (colour32 >> 8) & 0xff;
+        red = (colour32 >> 16) & 0xff;
+        //std::cout << red << " " << green << " " << blue << std::endl;
+        colour = Colour(red, green, blue);
+    }
     if (closestIntersection.intersectedTriangle.colour.red == 255 && closestIntersection.intersectedTriangle.colour.green == 0 && closestIntersection.intersectedTriangle.colour.blue == 255) {
         glm::vec3 reflection = glm::normalize(rayDirection - (2*glm::dot(rayDirection, triangle.normal)*triangle.normal));
         return allRayColour(modelTriangles, closestIntersection.intersectionPoint, lightPosition, reflection, times+1);
