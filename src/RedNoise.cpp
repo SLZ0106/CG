@@ -355,7 +355,7 @@ std::vector<ModelTriangle> SphereReader(const std::string& objFile, float scalin
     while(getline(File, myText)) {
         std::vector<std::string> text = split(myText, ' ');
         if(text[0] == "v") {
-            glm::vec3 v = glm::vec3(std::stod(text[1]), std::stod(text[2]), std::stod(text[3]));
+            glm::vec3 v = glm::vec3(std::stod(text[1])-0.5, std::stod(text[2])-1.1, std::stod(text[3]));
             vertex.push_back(v);
         } else if(text[0] == "f") {
             std::vector<std::string> f {text[1], text[2], text[3]};
@@ -718,7 +718,7 @@ glm::vec3 allRayColour(const std::vector<ModelTriangle>& modelTriangles, glm::ve
         colour = Colour(red, green, blue);
     }
 
-    int S = 16;
+    int S = 8;
     glm::vec3 pointA = closestIntersection.intersectedTriangle.vertices[0];
     glm::vec3 pointB = closestIntersection.intersectedTriangle.vertices[1];
     glm::vec3 pointC = closestIntersection.intersectedTriangle.vertices[2];
@@ -1003,10 +1003,10 @@ void drawPhong(DrawingWindow &window, const std::vector<ModelTriangle>& modelTri
 // ---------------------- Show in window ---------------------- //
 void handleEvent(SDL_Event event, DrawingWindow &window) {
     auto modelTriangles = objReader("textured-cornell-box.obj", "textured-cornell-box.mtl", 0.35);
-    //auto modelSphere = SphereReader("sphere.obj", 0.5);
-    //for (ModelTriangle triangle : modelSphere){
-    //    modelTriangles.push_back(triangle);
-    //}
+    auto modelSphere = SphereReader("sphere.obj", 0.5);
+    for (ModelTriangle triangle : modelSphere){
+        modelTriangles.push_back(triangle);
+    }
 	if (event.type == SDL_KEYDOWN) {
 		if (event.key.keysym.sym == SDLK_LEFT) {
             std::cout << "LEFT" << std::endl;
