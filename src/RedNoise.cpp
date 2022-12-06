@@ -355,7 +355,7 @@ std::vector<ModelTriangle> SphereReader(const std::string& objFile, float scalin
     while(getline(File, myText)) {
         std::vector<std::string> text = split(myText, ' ');
         if(text[0] == "v") {
-            glm::vec3 v = glm::vec3(std::stod(text[1])-0.5, std::stod(text[2])-0.1, std::stod(text[3])-0.2);
+            glm::vec3 v = glm::vec3(std::stod(text[1])+0.7, std::stod(text[2])-0.1, std::stod(text[3])-0.7);
             vertex.push_back(v);
         } else if(text[0] == "f") {
             std::vector<std::string> f {text[1], text[2], text[3]};
