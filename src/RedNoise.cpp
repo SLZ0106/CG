@@ -355,7 +355,7 @@ std::vector<ModelTriangle> SphereReader(const std::string& objFile, float scalin
     while(getline(File, myText)) {
         std::vector<std::string> text = split(myText, ' ');
         if(text[0] == "v") {
-            glm::vec3 v = glm::vec3(std::stod(text[1])-0.5, std::stod(text[2])-1.1, std::stod(text[3]));
+            glm::vec3 v = glm::vec3(std::stod(text[1])-0.5, std::stod(text[2])-1.2, std::stod(text[3]));
             vertex.push_back(v);
         } else if(text[0] == "f") {
             std::vector<std::string> f {text[1], text[2], text[3]};
@@ -1044,8 +1044,8 @@ void handleEvent(SDL_Event event, DrawingWindow &window) {
             drawTextureTriangle(window, getTextureMap("texture.ppm"), CanvasTriangle(point1, point2, point3));
         } else if(event.key.keysym.sym == SDLK_p) {
             PointCloud(window, modelTriangles, cameraPosition, cameraOrientation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
-            WireFrame(window, modelTriangles, cameraPosition, cameraOrientation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
-            Rasterised(window, modelTriangles, cameraPosition, cameraOrientation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
+            //WireFrame(window, modelTriangles, cameraPosition, cameraOrientation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
+            //Rasterised(window, modelTriangles, cameraPosition, cameraOrientation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
         } else if(event.key.keysym.sym == SDLK_w) {
             window.clearPixels();
             clearDepthBuffer();
