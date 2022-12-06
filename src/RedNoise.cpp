@@ -355,7 +355,7 @@ std::vector<ModelTriangle> SphereReader(const std::string& objFile, float scalin
     while(getline(File, myText)) {
         std::vector<std::string> text = split(myText, ' ');
         if(text[0] == "v") {
-            glm::vec3 v = glm::vec3(std::stod(text[1])+0.7, std::stod(text[2])-0.1, std::stod(text[3])-0.7);
+            glm::vec3 v = glm::vec3(std::stod(text[1])-0.9, std::stod(text[2])-1.6, std::stod(text[3])+0.2);
             vertex.push_back(v);
         } else if(text[0] == "f") {
             std::vector<std::string> f {text[1], text[2], text[3]};
@@ -1045,8 +1045,8 @@ void handleEvent(SDL_Event event, DrawingWindow &window) {
             point3.texturePoint.x = 65; point3.texturePoint.y = 330;
             drawTextureTriangle(window, getTextureMap("texture.ppm"), CanvasTriangle(point1, point2, point3));
         } else if(event.key.keysym.sym == SDLK_p) {
-            PointCloud(window, modelTriangles, cameraPosition, cameraOrientation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
-            //WireFrame(window, modelTriangles, cameraPosition, cameraOrientation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
+            //PointCloud(window, modelTriangles, cameraPosition, cameraOrientation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
+            // WireFrame(window, modelTriangles, cameraPosition, cameraOrientation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
             //Rasterised(window, modelTriangles, cameraPosition, cameraOrientation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
         } else if(event.key.keysym.sym == SDLK_w) {
             window.clearPixels();
@@ -1186,6 +1186,16 @@ void handleEvent(SDL_Event event, DrawingWindow &window) {
             //drawPhong(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
             shadingfactor = 3;
             drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
+        } else if (event.key.keysym.sym == SDLK_9){
+            window.clearPixels();
+            clearDepthBuffer();
+            float radianx;
+            radianx += 0.01;
+            glm::mat3 cameraRotation = glm::mat3(cos(radianx), 0, sin(radianx), 0, 1, 0, -sin(radianx), 0, cos(radianx));
+            Rotation = lookAt(cameraPosition);
+            Rotation = Rotation * cameraRotation;
+            cameraPosition =  cameraRotation * cameraPosition;
+            Rasterised(window, modelTriangles, cameraPosition, Rotation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
         } else if (event.key.keysym.sym == SDLK_c) {
             clearDepthBuffer();
             window.clearPixels();
