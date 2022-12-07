@@ -24,6 +24,7 @@ glm::vec3 SpherePoint(0,0,0);
 int shadingfactor = 1;
 std::vector<glm::vec3> lightpoints;
 float focalLength = 2.0;
+float xyzdistance;
 float x = 0.0;
 float y = 0.0;
 glm::vec3 newCameraPosition = cameraPosition;
@@ -403,6 +404,7 @@ std::vector<ModelTriangle> SphereReader(const std::string& objFile, float scalin
         modelTriangles.push_back(triangle);
     }
     get_xyz(vertex[0].x, vertex[0].y, vertex[0].z, vertex[10].x, vertex[10].y, vertex[10].z, vertex[20].x, vertex[20].y, vertex[20].z, vertex[30].x, vertex[30].y, vertex[30].z);
+    xyzdistance = glm::distance(vertex[0], SpherePoint);
     return modelTriangles;
 }
 
@@ -715,7 +717,7 @@ glm::vec3 allRayColour(const std::vector<ModelTriangle>& modelTriangles, glm::ve
 
     }
     if (closestIntersection.intersectedTriangle.colour.red == 12 && closestIntersection.intersectedTriangle.colour.green == 13 && closestIntersection.intersectedTriangle.colour.blue ==14){
-        glm::vec3 InSphere = (point - SpherePoint)/0.35;
+        glm::vec3 InSphere = (point - SpherePoint)/xyzdistance;
         float j = atan2(InSphere.z, InSphere.x);
         float k = asin(InSphere.y);
         float l = 1-(j+3.14)/(2*3.14);
