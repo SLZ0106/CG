@@ -405,7 +405,7 @@ std::vector<ModelTriangle> SphereReader(const std::string& objFile, float scalin
     }
     get_xyz(vertex[0].x, vertex[0].y, vertex[0].z, vertex[10].x, vertex[10].y, vertex[10].z, vertex[20].x, vertex[20].y, vertex[20].z, vertex[30].x, vertex[30].y, vertex[30].z);
     xyzdistance = glm::distance(vertex[0], SpherePoint);
-    std::cout<<xyzdistance<<std::endl;
+    //std::cout<<xyzdistance<<std::endl;
     //std::cout<< glm::to_string(SpherePoint)<<std::endl;
     return modelTriangles;
 }
@@ -1119,7 +1119,7 @@ void handleEvent(SDL_Event event, DrawingWindow &window) {
             //left
             window.clearPixels();
             clearDepthBuffer();
-            x = 1.0;
+            x += 1.0;
             float radianx = glm::radians(x);
             glm::mat3 cameraRotation = glm::mat3(cos(radianx), 0, sin(radianx), 0, 1, 0, -sin(radianx), 0, cos(radianx));
             //cameraPosition = cameraPosition * cameraRotation;
