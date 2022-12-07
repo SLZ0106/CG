@@ -29,7 +29,7 @@ float x = 0.0;
 float y = 0.0;
 glm::vec3 newCameraPosition = cameraPosition;
 float depthBuffer[HEIGHT][WIDTH];
-int imagesequence = 78;
+int imagesequence = 91;
 float rotateSphereY = 0.0;
 
 void clearDepthBuffer(){
