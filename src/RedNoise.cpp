@@ -29,7 +29,7 @@ float x = 0.0;
 float y = 0.0;
 glm::vec3 newCameraPosition = cameraPosition;
 float depthBuffer[HEIGHT][WIDTH];
-int imagesequence = 49;
+int imagesequence = 81;
 
 void clearDepthBuffer(){
     for(int y = 0; y < HEIGHT; y++)
@@ -540,11 +540,12 @@ void drawRasterisedShadowScene(DrawingWindow &window, const std::vector<ModelTri
         for(int x = 0; x < WIDTH; x++) {
             CanvasPoint point = CanvasPoint(float(x), float(y));
             glm::vec3 threeDPoint = get3DPoint(point, cameraPosition, focalLength, scalingFactor);
-            //int S = 16;
+            int S = 16;
             glm::vec3 rayDirection = glm::normalize(threeDPoint - cameraPosition);
             RayTriangleIntersection closestIntersection = getClosestIntersection(modelTriangles, cameraPosition, rayDirection);
             Colour colour = closestIntersection.intersectedTriangle.colour;
             glm::vec3 lightDirection = glm::normalize(closestIntersection.intersectionPoint - lightPosition);
+            float intensity = S /(4*3.1415*glm::length(lightDirection)*glm::length(lightDirection));
             RayTriangleIntersection lightIntersection = getClosestIntersection(modelTriangles, lightPosition, lightDirection);
             if (closestIntersection.triangleIndex != lightIntersection.triangleIndex) {
                 red = ((colour.red)*0.3);
@@ -552,9 +553,9 @@ void drawRasterisedShadowScene(DrawingWindow &window, const std::vector<ModelTri
                 blue = ((colour.red)*0.3);
             }else{
                 Colour colour = closestIntersection.intersectedTriangle.colour;
-                red = fmin(colour.red, 255);
-                green = fmin(colour.green, 255);
-                blue = fmin(colour.blue, 255);
+                red = fmin(colour.red*intensity, 255);
+                green = fmin(colour.green*intensity, 255);
+                blue = fmin(colour.blue*intensity, 255);
             }
             uint32_t c = (255 << 24) + (red << 16) + (green << 8) + blue;
             window.setPixelColour(x, y, c);
@@ -1124,8 +1125,8 @@ void handleEvent(SDL_Event event, DrawingWindow &window) {
             glm::mat3 cameraRotation = glm::mat3(cos(radianx), 0, sin(radianx), 0, 1, 0, -sin(radianx), 0, cos(radianx));
             cameraPosition = cameraPosition * cameraRotation;
             Rotation = Rotation * cameraRotation;
-            //Rasterised(window, modelTriangles, cameraPosition, Rotation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
-            drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
+            Rasterised(window, modelTriangles, cameraPosition, Rotation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
+            //drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
         } else if (event.key.keysym.sym == SDLK_e) {
             //right
             window.clearPixels();
@@ -1237,7 +1238,7 @@ void handleEvent(SDL_Event event, DrawingWindow &window) {
             window.clearPixels();
             clearDepthBuffer();
             float radianx;
-            radianx += 0.06;
+            radianx += 0.10;
             glm::mat3 cameraRotation = glm::mat3(cos(radianx), 0, sin(radianx), 0, 1, 0, -sin(radianx), 0, cos(radianx));
             Rotation = lookAt(cameraPosition);
             Rotation = Rotation * cameraRotation;
@@ -1249,7 +1250,7 @@ void handleEvent(SDL_Event event, DrawingWindow &window) {
             window.clearPixels();
             clearDepthBuffer();
             float radianx;
-            radianx -= 0.05;
+            radianx -= 0.10;
             glm::mat3 cameraRotation = glm::mat3(cos(radianx), 0, sin(radianx), 0, 1, 0, -sin(radianx), 0, cos(radianx));
             Rotation = lookAt(cameraPosition);
             Rotation = Rotation * cameraRotation;
