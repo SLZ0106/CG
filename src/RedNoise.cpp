@@ -800,7 +800,7 @@ glm::vec3 allRayColour(const std::vector<ModelTriangle>& modelTriangles, glm::ve
         return allRayColour(modelTriangles, closestIntersection.intersectionPoint, lightPosition, reflection, times+1);
     }
     if (closestIntersection.intersectedTriangle.colour.name == "Cobbles") {
-        TextureMap textureMap = getTextureMap("texture.ppm");
+        TextureMap textureMap = getTextureMap("chessboard.ppm");
         glm::vec3 point = closestIntersection.intersectionPoint;
         //std::cout << glm::to_string(point) << std::endl;
         std::array<glm::vec3, 3> vertices = closestIntersection.intersectedTriangle.vertices;
