@@ -14,8 +14,8 @@
 #include <glm/gtx/string_cast.hpp>
 
 
-#define WIDTH 320//960
-#define HEIGHT 240//720
+#define WIDTH 640//960
+#define HEIGHT 480//720
 glm::vec3 cameraPosition (0.0, 0.0, 4.0);
 glm::mat3 cameraOrientation (1, 0, 0, 0, 1, 0 ,0, 0, 1); 
 glm::mat3 Rotation(1, 0, 0, 0, 1, 0 ,0, 0, 1);
@@ -29,7 +29,7 @@ float x = 0.0;
 float y = 0.0;
 glm::vec3 newCameraPosition = cameraPosition;
 float depthBuffer[HEIGHT][WIDTH];
-int imagesequence = 81;
+int imagesequence = 78;
 float rotateSphereY = 0.0;
 
 void clearDepthBuffer(){
@@ -773,7 +773,7 @@ glm::vec3 allRayColour(const std::vector<ModelTriangle>& modelTriangles, glm::ve
         colour = Colour(red, green, blue);
     }
 
-    int S = 8;
+    int S = 16;
     glm::vec3 pointA = closestIntersection.intersectedTriangle.vertices[0];
     glm::vec3 pointB = closestIntersection.intersectedTriangle.vertices[1];
     glm::vec3 pointC = closestIntersection.intersectedTriangle.vertices[2];
@@ -1110,22 +1110,27 @@ void handleEvent(SDL_Event event, DrawingWindow &window) {
             window.clearPixels();
             clearDepthBuffer();
             cameraPosition.y -= 0.05;
-            Rasterised(window, modelTriangles, cameraPosition, cameraOrientation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
+            PointCloud(window, modelTriangles, cameraPosition, cameraOrientation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
+            //Rasterised(window, modelTriangles, cameraPosition, cameraOrientation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
         } else if (event.key.keysym.sym == SDLK_s) {
             window.clearPixels();
             clearDepthBuffer();
             cameraPosition.y += 0.05;
-            Rasterised(window, modelTriangles, cameraPosition, cameraOrientation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
+            //PointCloud(window, modelTriangles, cameraPosition, cameraOrientation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
+            WireFrame(window, modelTriangles, cameraPosition, cameraOrientation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
+            //Rasterised(window, modelTriangles, cameraPosition, cameraOrientation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
         } else if (event.key.keysym.sym == SDLK_a) {
             window.clearPixels();
             clearDepthBuffer();
             cameraPosition.x += 0.05;
-            Rasterised(window, modelTriangles, cameraPosition, cameraOrientation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
+            PointCloud(window, modelTriangles, cameraPosition, cameraOrientation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
+            //Rasterised(window, modelTriangles, cameraPosition, cameraOrientation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
         } else if (event.key.keysym.sym == SDLK_d) {
             window.clearPixels();
             clearDepthBuffer();
             cameraPosition.x -= 0.05;
-            Rasterised(window, modelTriangles, cameraPosition, cameraOrientation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
+            WireFrame(window, modelTriangles, cameraPosition, cameraOrientation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
+            //Rasterised(window, modelTriangles, cameraPosition, cameraOrientation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
         } else if (event.key.keysym.sym == SDLK_q) {
             //left
             window.clearPixels();
