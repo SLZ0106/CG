@@ -410,6 +410,57 @@ std::vector<ModelTriangle> SphereReader(const std::string& objFile, float scalin
     //std::cout<< glm::to_string(SpherePoint)<<std::endl;
     return modelTriangles;
 }
+/*
+std::vector<ModelTriangle> LogoReader(const std::string& objFile, float scalingFactor){
+    std::vector<glm::vec3> vertex;
+    std::vector<std::vector<std::string>> facets;
+    std::vector<ModelTriangle> modelTriangles;
+    std::vector<glm::vec2> texture;
+    std::string myText;
+    std::string colourName;
+    std::ifstream File(objFile);
+    while(getline(File, myText)){
+        std::vector<std::string> text = split(myText, ' ');
+        if(text[0] == "v") {
+            glm::vec3 v = glm::vec3(std::stod(text[1])*scalingFactor, std::stod(text[2])*scalingFactor, std::stod(text[3])*scalingFactor);
+            vertex.push_back(v);
+        } else if(text[0] == "f") {
+            std::vector<std::string> f {text[1], text[2], text[3], colourName};
+            facets.push_back(f);
+        } else if(text[0] == "vt") {
+            glm::vec2 vt = glm::vec2(std::stod(text[1]), std::stod(text[2]));
+            //std::cout << glm::to_string(vt) << std::endl;
+            texture.push_back(vt);
+        }
+    }
+    File.close();
+    for(std::vector<std::string> i : facets) {
+        glm::vec3 v0 = vertex[std::stoi(i[0])-1];
+        glm::vec3 v1 = vertex[std::stoi(i[1])-1];
+        glm::vec3 v2 = vertex[std::stoi(i[2])-1];
+        glm::vec3 normal = glm::normalize(glm::cross(v1-v0, v2-v0));
+        float red = 67.0;
+        float green = 69.0;
+        float blue = 71.0;
+        Colour colour = Colour(int(red), int(green), int(blue));
+        ModelTriangle triangle = ModelTriangle(v0, v1, v2, colour);
+        triangle.normal = normal;
+        std::vector<std::string> v0String = split(i[0], '/');
+        std::vector<std::string> v1String = split(i[1], '/');
+        std::vector<std::string> v2String = split(i[2], '/');
+        if (atoi(v0String[1].c_str()) != 0 && atoi(v1String[1].c_str()) != 0 && atoi(v2String[1].c_str()) != 0) {
+            triangle.texturePoints = {TexturePoint(texture[atoi(v0String[1].c_str()) - 1][0],
+                                                   texture[atoi(v0String[1].c_str()) - 1][1]),
+                                      TexturePoint(texture[atoi(v1String[1].c_str()) - 1][0],
+                                                   texture[atoi(v1String[1].c_str()) - 1][1]),
+                                      TexturePoint(texture[atoi(v2String[1].c_str()) - 1][0],
+                                                   texture[atoi(v2String[1].c_str()) - 1][1])};
+        }
+        modelTriangles.push_back(triangle);
+    }
+    return modelTriangles;
+}
+*/
 
 CanvasPoint getCanvasIntersectionPoint(glm::vec3 cameraPosition, glm::mat3 cameraOrientation, glm::vec3 vertexPosition, float focallength, float scalingFactor) {
     CanvasPoint twoDPoint;
@@ -1063,6 +1114,7 @@ void handleEvent(SDL_Event event, DrawingWindow &window) {
     for (ModelTriangle triangle : modelSphere){
         modelTriangles.push_back(triangle);
     }
+    //auto modelTriangles = LogoReader("logo.obj", 0.35);
 	if (event.type == SDL_KEYDOWN) {
 		if (event.key.keysym.sym == SDLK_LEFT) {
             std::cout << "LEFT" << std::endl;
