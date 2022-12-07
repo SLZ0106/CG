@@ -721,7 +721,7 @@ glm::vec3 allRayColour(const std::vector<ModelTriangle>& modelTriangles, glm::ve
 
     }
     if (closestIntersection.intersectedTriangle.colour.red == 12 && closestIntersection.intersectedTriangle.colour.green == 13 && closestIntersection.intersectedTriangle.colour.blue ==14){
-
+        
         float radianRotateSphereY = glm::radians(rotateSphereY);
         glm::mat3 rotateSphereYMatrix = glm::mat3{{cos(radianRotateSphereY), 0, sin(radianRotateSphereY)},
                                                   {0, 1, 0},
@@ -729,6 +729,8 @@ glm::vec3 allRayColour(const std::vector<ModelTriangle>& modelTriangles, glm::ve
         glm::vec3 pointTranslate = point - SpherePoint;
         pointTranslate = rotateSphereYMatrix * pointTranslate;
         point = pointTranslate + SpherePoint;
+        glm::vec3 InSphere = (point - SpherePoint)/xyzdistance;
+
         glm::vec3 InSphere = (point - SpherePoint)/xyzdistance;
         float j = atan2(InSphere.z, InSphere.x);
         float k = asin(InSphere.y);
@@ -877,7 +879,8 @@ glm::vec3 allRayColour(const std::vector<ModelTriangle>& modelTriangles, glm::ve
 
 void drawSpecular(DrawingWindow &window, const std::vector<ModelTriangle>& modelTriangles, glm::vec3 cameraPosition, glm::vec3 lightPosition, float focalLength, float scalingFactor) {
     lightpoints = MultiLight(lightPosition, 15, 0.03);
-    rotateSphereY += 25;
+    glm::mat3x3 lookAtMatrix = lookAt(cameraPosition);
+    if(true) rotateSphereY += 35;
     for(int y = 0; y < HEIGHT; y++) {
         for(int x = 0; x < WIDTH; x++) {
             CanvasPoint point = CanvasPoint(float(x), float(y));
