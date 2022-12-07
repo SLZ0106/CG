@@ -730,8 +730,6 @@ glm::vec3 allRayColour(const std::vector<ModelTriangle>& modelTriangles, glm::ve
         pointTranslate = rotateSphereYMatrix * pointTranslate;
         point = pointTranslate + SpherePoint;
         glm::vec3 InSphere = (point - SpherePoint)/xyzdistance;
-
-        glm::vec3 InSphere = (point - SpherePoint)/xyzdistance;
         float j = atan2(InSphere.z, InSphere.x);
         float k = asin(InSphere.y);
         float l = 1-(j+3.14)/(2*3.14);
