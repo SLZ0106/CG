@@ -381,7 +381,7 @@ std::vector<ModelTriangle> SphereReader(const std::string& objFile, float scalin
     while(getline(File, myText)) {
         std::vector<std::string> text = split(myText, ' ');
         if(text[0] == "v") {
-            glm::vec3 v = glm::vec3(std::stod(text[1])-0.5, std::stod(text[2])-2.11, std::stod(text[3])-0.65);
+            glm::vec3 v = glm::vec3(std::stod(text[1])-0.5, std::stod(text[2])-2.12, std::stod(text[3])-0.65);
             vertex.push_back(v);
         } else if(text[0] == "f") {
             std::vector<std::string> f {text[1], text[2], text[3]};
@@ -405,7 +405,7 @@ std::vector<ModelTriangle> SphereReader(const std::string& objFile, float scalin
     }
     get_xyz(vertex[0].x, vertex[0].y, vertex[0].z, vertex[10].x, vertex[10].y, vertex[10].z, vertex[20].x, vertex[20].y, vertex[20].z, vertex[30].x, vertex[30].y, vertex[30].z);
     xyzdistance = glm::distance(vertex[0], SpherePoint);
-    std::cout<< glm::to_string(SpherePoint)<<std::endl;
+    //std::cout<< glm::to_string(SpherePoint)<<std::endl;
     return modelTriangles;
 }
 
