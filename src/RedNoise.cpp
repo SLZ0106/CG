@@ -943,6 +943,7 @@ void drawSpecular(DrawingWindow &window, const std::vector<ModelTriangle>& model
     }
 } 
 
+/*
 void drawGouraud(DrawingWindow &window, const std::vector<ModelTriangle>& modelTriangles, glm::vec3 cameraPosition, glm::vec3 lightPosition, float focalLength, float scalingFactor) {
     int red;
     int green;
@@ -1102,8 +1103,7 @@ void drawPhong(DrawingWindow &window, const std::vector<ModelTriangle>& modelTri
         } 
     }
 } 
-
-
+*/
 
 
 
