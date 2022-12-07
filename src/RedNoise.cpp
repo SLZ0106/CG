@@ -1122,7 +1122,7 @@ void handleEvent(SDL_Event event, DrawingWindow &window) {
             x += 1.0;
             float radianx = glm::radians(x);
             glm::mat3 cameraRotation = glm::mat3(cos(radianx), 0, sin(radianx), 0, 1, 0, -sin(radianx), 0, cos(radianx));
-            //cameraPosition = cameraPosition * cameraRotation;
+            cameraPosition = cameraPosition * cameraRotation;
             Rotation = Rotation * cameraRotation;
             //Rasterised(window, modelTriangles, cameraPosition, Rotation, focalLength, float(HEIGHT)*2/3, Colour(255, 255, 255));
             drawSpecular(window, modelTriangles, cameraPosition, lightposition, focalLength, float(HEIGHT)*2/3);
