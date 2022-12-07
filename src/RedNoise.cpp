@@ -1130,7 +1130,7 @@ void handleEvent(SDL_Event event, DrawingWindow &window) {
             //right
             window.clearPixels();
             clearDepthBuffer();
-            x = 1.0;
+            x -= 1.0;
             float radianx = glm::radians(x);
             glm::mat3 cameraRotation = glm::mat3(cos(radianx), 0, -sin(radianx), 0, 1, 0, sin(radianx), 0, cos(radianx));
             cameraPosition = cameraPosition * cameraRotation;
@@ -1141,7 +1141,7 @@ void handleEvent(SDL_Event event, DrawingWindow &window) {
             //downwards
             window.clearPixels();
             clearDepthBuffer();
-            y = 0.3;
+            y += 0.3;
             float radiany = glm::radians(y);
             glm::mat3 cameraRotation = glm::mat3(1, 0, 0, 0, cos(radiany), sin(radiany), 0, -sin(radiany), cos(radiany));
             cameraPosition = cameraPosition * cameraRotation;
@@ -1152,7 +1152,7 @@ void handleEvent(SDL_Event event, DrawingWindow &window) {
             //upwards
             window.clearPixels();
             clearDepthBuffer();
-            y = 0.3;
+            y -= 0.3;
             float radiany = glm::radians(y);
             glm::mat3 cameraRotation = glm::mat3(1, 0, 0, 0, cos(radiany), -sin(radiany), 0, sin(radiany), cos(radiany));
             cameraPosition = cameraPosition * cameraRotation;
